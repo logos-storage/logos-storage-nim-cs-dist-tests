@@ -4,8 +4,8 @@ name: Run Release Tests
 on:
   workflow_dispatch:
     inputs:
-      codexdockerimage:
-        description: "Codex Docker image (example: 'codexstorage/nim-codex:0.1.8-dist-tests')"
+      storagedockerimage:
+        description: "Logos Storage Docker image (example: 'logosstorage/logos-storage-nim:0.1.8-dist-tests')"
         required: true
         type: string
   workflow_call:
@@ -18,8 +18,8 @@ on:
         description: Branch with tests (master)
         required: false
         type: string
-      codexdockerimage:
-        description: "Codex Docker image (example: 'codexstorage/nim-codex:0.1.8-dist-tests')"
+      storagedockerimage:
+        description: "Logos Storage Docker image (example: 'logosstorage/logos-storage-nim:0.1.8-dist-tests')"
         required: true
         type: string
       workflow_source:
@@ -31,7 +31,7 @@ on:
 env:
   SOURCE: ${{ format('{0}/{1}', github.server_url, github.repository) }}
   BRANCH: ${{ github.ref_name }}
-  CODEXDOCKERIMAGE: codexstorage/nim-codex:latest-dist-tests
+  STORAGEDOCKERIMAGE: logosstorage/logos-storage-nim:latest-dist-tests
   TEST_TYPE: release-tests
   NAMEPREFIX: r-tests
   NAMESPACE: default
@@ -58,7 +58,7 @@ jobs:
           echo "TESTID=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
           [[ -n "${{ inputs.source }}" ]] && echo "SOURCE=${{ inputs.source }}" >>"$GITHUB_ENV" || echo "SOURCE=${{ env.SOURCE }}" >>"$GITHUB_ENV"
           [[ -n "${{ inputs.branch }}" ]] && echo "BRANCH=${{ inputs.branch }}" >>"$GITHUB_ENV" || echo "BRANCH=${{ env.BRANCH }}" >>"$GITHUB_ENV"
-          [[ -n "${{ inputs.codexdockerimage }}" ]] && echo "CODEXDOCKERIMAGE=${{ inputs.codexdockerimage }}" >>"$GITHUB_ENV" || echo "CODEXDOCKERIMAGE=${{ env.CODEXDOCKERIMAGE }}" >>"$GITHUB_ENV"
+          [[ -n "${{ inputs.storagedockerimage }}" ]] && echo "STORAGEDOCKERIMAGE=${{ inputs.storagedockerimage }}" >>"$GITHUB_ENV" || echo "STORAGEDOCKERIMAGE=${{ env.STORAGEDOCKERIMAGE }}" >>"$GITHUB_ENV"
           [[ -n "${{ inputs.nameprefix }}" ]] && NAMEPREFIX="`awk '{ print tolower($0) }' <<< ${{ inputs.nameprefix }}`" || NAMEPREFIX="`awk '{ print tolower($0) }' <<< ${{ env.NAMEPREFIX }}`"
           echo "NAMEPREFIX=${NAMEPREFIX}-${RUNID}" >>"$GITHUB_ENV"
           [[ -n "${{ inputs.namespace }}" ]] && echo "NAMESPACE=${{ inputs.namespace }}" >>"$GITHUB_ENV" || echo "NAMESPACE=${{ env.NAMESPACE }}" >>"$GITHUB_ENV"
