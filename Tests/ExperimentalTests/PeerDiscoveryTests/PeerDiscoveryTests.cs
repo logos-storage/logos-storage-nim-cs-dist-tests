@@ -1,4 +1,4 @@
-﻿using CodexContractsPlugin;
+// MARKETPLACE REMOVED: using CodexContractsPlugin;
 using CodexClient;
 using NUnit.Framework;
 using Utils;
@@ -27,16 +27,17 @@ namespace ExperimentalTests.PeerDiscoveryTests
             AssertAllNodesConnected(nodes);
         }
 
-        [Test]
-        public void MarketplaceDoesNotInterfereWithPeerDiscovery()
-        {
-            var geth = StartGethNode(s => s.IsMiner());
-            var contracts = Ci.StartCodexContracts(geth, BootstrapNode.Version);
-            var nodes = StartCodex(2, s => s.EnableMarketplace(geth, contracts, m => m
-                .WithInitial(10.Eth(), 1000.TstWei())));
-
-            AssertAllNodesConnected(nodes);
-        }
+        // MARKETPLACE REMOVED: MarketplaceDoesNotInterfereWithPeerDiscovery test
+        // [Test]
+        // public void MarketplaceDoesNotInterfereWithPeerDiscovery()
+        // {
+        //     var geth = StartGethNode(s => s.IsMiner());
+        //     var contracts = Ci.StartCodexContracts(geth, BootstrapNode.Version);
+        //     var nodes = StartCodex(2, s => s.EnableMarketplace(geth, contracts, m => m
+        //         .WithInitial(10.Eth(), 1000.TstWei())));
+        //
+        //     AssertAllNodesConnected(nodes);
+        // }
 
         [TestCase(2)]
         [TestCase(3)]

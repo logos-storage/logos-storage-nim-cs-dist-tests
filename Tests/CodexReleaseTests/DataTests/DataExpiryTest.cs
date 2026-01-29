@@ -1,4 +1,5 @@
-﻿using CodexContractsPlugin;
+/* MARKETPLACE REMOVED
+using CodexContractsPlugin;
 using CodexPlugin;
 using CodexTests;
 using NUnit.Framework;
@@ -146,3 +147,4 @@ namespace CodexReleaseTests.DataTests
         }
     }
 }
+*/

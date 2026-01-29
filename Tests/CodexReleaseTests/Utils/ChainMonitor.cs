@@ -1,4 +1,5 @@
-﻿using CodexContractsPlugin;
+/* MARKETPLACE REMOVED
+using CodexContractsPlugin;
 using CodexContractsPlugin.ChainMonitor;
 using GethPlugin;
 using Logging;
@@ -74,3 +75,4 @@ namespace CodexReleaseTests.Utils
         }
     }
 }
+*/

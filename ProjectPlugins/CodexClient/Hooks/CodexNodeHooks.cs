@@ -11,7 +11,7 @@ namespace CodexClient.Hooks
         void OnFileUploaded(string uid, ByteSize size, ContentId cid);
         void OnFileDownloading(ContentId cid);
         void OnFileDownloaded(ByteSize size, ContentId cid);
-        void OnStorageContractSubmitted(StoragePurchaseContract storagePurchaseContract);
+        void OnStorageContractSubmitted(IStoragePurchaseContract storagePurchaseContract);
         void OnStorageContractUpdated(StoragePurchase purchaseStatus);
         void OnStorageAvailabilityCreated(StorageAvailability response);
     }
@@ -65,7 +65,7 @@ namespace CodexClient.Hooks
             foreach (var h in backingHooks) h.OnStorageAvailabilityCreated(response);
         }
 
-        public void OnStorageContractSubmitted(StoragePurchaseContract storagePurchaseContract)
+        public void OnStorageContractSubmitted(IStoragePurchaseContract storagePurchaseContract)
         {
             foreach (var h in backingHooks) h.OnStorageContractSubmitted(storagePurchaseContract);
         }

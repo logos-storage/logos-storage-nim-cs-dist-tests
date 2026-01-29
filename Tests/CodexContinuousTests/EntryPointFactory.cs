@@ -8,8 +8,8 @@ namespace ContinuousTests
         public EntryPointFactory()
         {
             ProjectPlugin.Load<CodexPlugin.CodexPlugin>();
-            ProjectPlugin.Load<CodexContractsPlugin.CodexContractsPlugin>();
-            ProjectPlugin.Load<GethPlugin.GethPlugin>();
+            // MARKETPLACE REMOVED: ProjectPlugin.Load<CodexContractsPlugin.CodexContractsPlugin>();
+            // MARKETPLACE REMOVED: ProjectPlugin.Load<GethPlugin.GethPlugin>();
             ProjectPlugin.Load<MetricsPlugin.MetricsPlugin>();
         }
 

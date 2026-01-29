@@ -76,7 +76,7 @@ namespace DistTestCore
         private static string ReplaceInvalidCharacters(string name)
         {
             return name
-                .Replace("codexstorage/nim-codex:", "")
+                .Replace("logosstorage/logos-storage-nim:", "")
                 .Replace("-dist-tests", "")
                 .Replace(":", "_")
                 .Replace("/", "_")

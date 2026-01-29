@@ -1,4 +1,5 @@
-﻿using CodexClient;
+/* MARKETPLACE REMOVED
+using CodexClient;
 using CodexContractsPlugin;
 using CodexContractsPlugin.ChainMonitor;
 using CodexContractsPlugin.Marketplace;
@@ -83,7 +84,7 @@ namespace CodexReleaseTests.Utils
             {
                 AssertTstBalance(host, StartingBalanceTST.Tst(), nameof(StartHosts));
                 AssertEthBalance(host, StartingBalanceEth.Eth(), nameof(StartHosts));
-                
+
                 host.Marketplace.MakeStorageAvailable(new CreateStorageAvailability(
                     totalSpace: HostAvailabilitySize,
                     maxDuration: HostAvailabilityMaxDuration,
@@ -173,7 +174,7 @@ namespace CodexReleaseTests.Utils
 
                 if (balance != expectedBalance)
                 {
-                    throw new Exception(nameof(AssertEthBalance) + 
+                    throw new Exception(nameof(AssertEthBalance) +
                         $" expected: {expectedBalance} but was: {balance} - message: " + message);
                 }
             });
@@ -459,7 +460,7 @@ namespace CodexReleaseTests.Utils
             // Except: the proof requirement has a concept of "downtime":
             // a segment of time where proof is not required.
             // We calculate the probability of downtime and extend the waiting
-            // timeframe by a factor, such that all hosts are highly likely to have 
+            // timeframe by a factor, such that all hosts are highly likely to have
             // failed a sufficient number of proofs.
 
             float n = requiredNumMissedProofs;
@@ -502,3 +503,4 @@ namespace CodexReleaseTests.Utils
         }
     }
 }
+*/

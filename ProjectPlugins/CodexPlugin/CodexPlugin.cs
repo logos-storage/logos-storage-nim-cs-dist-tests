@@ -74,22 +74,23 @@ namespace CodexPlugin
             return codexWrapper.WrapCodexInstances(instances);
         }
 
-        public void WireUpMarketplace(ICodexNodeGroup result, Action<ICodexSetup> setup)
-        {
-            var codexSetup = GetSetup(1, setup);
-            if (codexSetup.MarketplaceConfig == null) return;
-            
-            var mconfig = codexSetup.MarketplaceConfig;
-            foreach (var node in result)
-            {
-                mconfig.GethNode.SendEth(node, mconfig.MarketplaceSetup.InitialEth);
-                mconfig.CodexContracts.MintTestTokens(node, mconfig.MarketplaceSetup.InitialTestTokens);
-
-                Log($"Send {mconfig.MarketplaceSetup.InitialEth} and " +
-                    $"minted {mconfig.MarketplaceSetup.InitialTestTokens} for " +
-                    $"{node.GetName()} (address: {node.EthAddress})");
-            }
-        }
+        // MARKETPLACE REMOVED: WireUpMarketplace method
+        // public void WireUpMarketplace(ICodexNodeGroup result, Action<ICodexSetup> setup)
+        // {
+        //     var codexSetup = GetSetup(1, setup);
+        //     if (codexSetup.MarketplaceConfig == null) return;
+        //
+        //     var mconfig = codexSetup.MarketplaceConfig;
+        //     foreach (var node in result)
+        //     {
+        //         mconfig.GethNode.SendEth(node, mconfig.MarketplaceSetup.InitialEth);
+        //         mconfig.CodexContracts.MintTestTokens(node, mconfig.MarketplaceSetup.InitialTestTokens);
+        //
+        //         Log($"Send {mconfig.MarketplaceSetup.InitialEth} and " +
+        //             $"minted {mconfig.MarketplaceSetup.InitialTestTokens} for " +
+        //             $"{node.GetName()} (address: {node.EthAddress})");
+        //     }
+        // }
 
         public void AddCodexHooksProvider(ICodexHooksProvider hooksProvider)
         {

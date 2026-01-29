@@ -1,4 +1,5 @@
-﻿using CodexClient;
+/* MARKETPLACE REMOVED
+using CodexClient;
 using CodexContractsPlugin.ChainMonitor;
 using CodexReleaseTests.Utils;
 using Nethereum.Hex.HexConvertors.Extensions;
@@ -97,3 +98,4 @@ namespace CodexReleaseTests.MarketTests
         }
     }
 }
+*/

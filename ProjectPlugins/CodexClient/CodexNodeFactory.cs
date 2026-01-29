@@ -45,8 +45,8 @@ namespace CodexClient
 
         private IMarketplaceAccess CreateMarketplaceAccess(ICodexInstance instance, CodexAccess access, ICodexNodeHooks hooks)
         {
-            if (instance.EthAccount == null) return new MarketplaceUnavailable();
-            return new MarketplaceAccess(log, access, hooks);
+            // MARKETPLACE REMOVED: always return unavailable
+            return new MarketplaceUnavailable();
         }
     }
 }

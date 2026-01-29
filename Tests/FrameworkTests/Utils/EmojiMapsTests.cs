@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+/* MARKETPLACE REMOVED
+using NUnit.Framework;
 using System.Text;
 using TestNetRewarder;
 
@@ -21,8 +22,9 @@ namespace FrameworkTests.Utils
 
             var out1 = maps.StringToEmojis(input, outLength);
             var out2 = maps.StringToEmojis(input, outLength);
-            
+
             Assert.That(out1, Is.EqualTo(out2));
         }
     }
 }
+*/

@@ -1,4 +1,5 @@
-﻿using CodexClient;
+/* MARKETPLACE REMOVED
+using CodexClient;
 using CodexContractsPlugin;
 using CodexContractsPlugin.Marketplace;
 using CodexPlugin;
@@ -171,3 +172,4 @@ namespace ExperimentalTests.BasicTests
         }
     }
 }
+*/

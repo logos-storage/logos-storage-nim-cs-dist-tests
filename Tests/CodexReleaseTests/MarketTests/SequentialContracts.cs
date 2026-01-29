@@ -1,4 +1,5 @@
-﻿using CodexClient;
+/* MARKETPLACE REMOVED
+using CodexClient;
 using CodexPlugin;
 using CodexReleaseTests.Utils;
 using NUnit.Framework;
@@ -115,3 +116,4 @@ namespace CodexReleaseTests.MarketTests
         }
     }
 }
+*/

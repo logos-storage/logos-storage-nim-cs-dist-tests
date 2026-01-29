@@ -108,7 +108,7 @@ namespace CodexPlugin.OverwatchSupport
             });
         }
 
-        public void OnStorageContractSubmitted(StoragePurchaseContract storagePurchaseContract)
+        public void OnStorageContractSubmitted(IStoragePurchaseContract storagePurchaseContract)
         {
             WriteCodexEvent(e =>
             {

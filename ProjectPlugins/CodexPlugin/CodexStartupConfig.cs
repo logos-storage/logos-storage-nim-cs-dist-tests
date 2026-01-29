@@ -12,7 +12,7 @@ namespace CodexPlugin
         public CodexLogCustomTopics? CustomTopics { get; set; } = new CodexLogCustomTopics(CodexLogLevel.Info, CodexLogLevel.Warn);
         public ByteSize? StorageQuota { get; set; }
         public bool MetricsEnabled { get; set; }
-        public MarketplaceInitialConfig? MarketplaceConfig { get; set; }
+        // MARKETPLACE REMOVED: public MarketplaceInitialConfig? MarketplaceConfig { get; set; }
         public string? BootstrapSpr { get; set; }
         public int? BlockTTL { get; set; }
         public uint? SimulateProofFailures { get; set; }

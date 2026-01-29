@@ -23,10 +23,6 @@ Read more [HERE](/Tests/CodexTests/README.md)
 A console application that runs tests in an endless loop against a persistent deployment of Codex nodes.
 Read more [HERE](/Tests/CodexContinuousTests/README.md)
 
-## Tools/CodexNetDeployer
-A console application that can deploy Codex nodes.
-Read more [HERE](/Tools/CodexNetDeployer/README.MD)
-
 ## Framework architecture
 The framework is designed to be extended by project-specific plugins. These plugins contribute functionality and abstractions to the framework. Users of the framework use these to perform tasks such as testing and deploying.
 ![Architecture](/docs/FrameworkArchitecture.png)

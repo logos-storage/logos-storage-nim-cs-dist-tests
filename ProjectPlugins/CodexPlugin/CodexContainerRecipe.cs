@@ -1,4 +1,4 @@
-﻿using GethPlugin;
+// MARKETPLACE REMOVED: using GethPlugin;
 using KubernetesWorkflow;
 using KubernetesWorkflow.Recipe;
 using Utils;
@@ -97,30 +97,31 @@ namespace CodexPlugin
                 AddEnvVar("CODEX_SIMULATE_PROOF_FAILURES", config.SimulateProofFailures.ToString()!);
             }
 
-            if (config.MarketplaceConfig != null)
-            {
-                var mconfig = config.MarketplaceConfig;
-                var gethStart = mconfig.GethNode.StartResult;
-                var wsAddress = gethStart.Container.GetInternalAddress(GethContainerRecipe.WsPortTag);
-                var marketplaceAddress = mconfig.CodexContracts.Deployment.MarketplaceAddress;
-
-                AddEnvVar("CODEX_ETH_PROVIDER", $"{wsAddress.Host.Replace("http://", "ws://")}:{wsAddress.Port}");
-                AddEnvVar("CODEX_MARKETPLACE_ADDRESS", marketplaceAddress);
-
-                var marketplaceSetup = config.MarketplaceConfig.MarketplaceSetup;
-
-                // Custom scripting in the Codex test image will write this variable to a private-key file,
-                // and pass the correct filename to Codex.
-                var account = marketplaceSetup.EthAccountSetup.GetNew();
-                AddEnvVar("ETH_PRIVATE_KEY", account.PrivateKey);
-                Additional(account);
-
-                SetCommandOverride(marketplaceSetup);
-                if (marketplaceSetup.IsValidator)
-                {
-                   AddEnvVar("CODEX_VALIDATOR", "true");
-                }
-            }
+            // MARKETPLACE REMOVED: MarketplaceConfig configuration block
+            // if (config.MarketplaceConfig != null)
+            // {
+            //     var mconfig = config.MarketplaceConfig;
+            //     var gethStart = mconfig.GethNode.StartResult;
+            //     var wsAddress = gethStart.Container.GetInternalAddress(GethContainerRecipe.WsPortTag);
+            //     var marketplaceAddress = mconfig.CodexContracts.Deployment.MarketplaceAddress;
+            //
+            //     AddEnvVar("CODEX_ETH_PROVIDER", $"{wsAddress.Host.Replace("http://", "ws://")}:{wsAddress.Port}");
+            //     AddEnvVar("CODEX_MARKETPLACE_ADDRESS", marketplaceAddress);
+            //
+            //     var marketplaceSetup = config.MarketplaceConfig.MarketplaceSetup;
+            //
+            //     // Custom scripting in the Codex test image will write this variable to a private-key file,
+            //     // and pass the correct filename to Codex.
+            //     var account = marketplaceSetup.EthAccountSetup.GetNew();
+            //     AddEnvVar("ETH_PRIVATE_KEY", account.PrivateKey);
+            //     Additional(account);
+            //
+            //     SetCommandOverride(marketplaceSetup);
+            //     if (marketplaceSetup.IsValidator)
+            //     {
+            //        AddEnvVar("CODEX_VALIDATOR", "true");
+            //     }
+            // }
 
             if (!string.IsNullOrEmpty(config.NameOverride))
             {
@@ -128,17 +129,18 @@ namespace CodexPlugin
             }
         }
 
-        private void SetCommandOverride(MarketplaceSetup ms)
-        {
-            if (ms.IsStorageNode)
-            {
-                OverrideCommand("bash", "/docker-entrypoint.sh", "codex", "persistence", "prover");
-            }
-            else
-            {
-                OverrideCommand("bash", "/docker-entrypoint.sh", "codex", "persistence");
-            }
-        }
+        // MARKETPLACE REMOVED: SetCommandOverride method
+        // private void SetCommandOverride(MarketplaceSetup ms)
+        // {
+        //     if (ms.IsStorageNode)
+        //     {
+        //         OverrideCommand("bash", "/docker-entrypoint.sh", "codex", "persistence", "prover");
+        //     }
+        //     else
+        //     {
+        //         OverrideCommand("bash", "/docker-entrypoint.sh", "codex", "persistence");
+        //     }
+        // }
 
         private Port CreateApiPort(CodexStartupConfig config, string tag)
         {

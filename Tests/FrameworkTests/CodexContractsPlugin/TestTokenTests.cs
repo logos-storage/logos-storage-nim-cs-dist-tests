@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+/* MARKETPLACE REMOVED
+using NUnit.Framework;
 using System.Numerics;
 using Utils;
 
@@ -44,3 +45,4 @@ namespace FrameworkTests.CodexContractsPlugin
         }
     }
 }
+*/

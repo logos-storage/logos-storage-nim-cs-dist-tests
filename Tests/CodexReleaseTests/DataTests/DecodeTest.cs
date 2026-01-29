@@ -1,4 +1,5 @@
-﻿using CodexReleaseTests.Utils;
+/* MARKETPLACE REMOVED
+using CodexReleaseTests.Utils;
 using NUnit.Framework;
 using Utils;
 
@@ -92,3 +93,4 @@ namespace CodexReleaseTests.DataTests
         }
     }
 }
+*/

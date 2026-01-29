@@ -1,4 +1,5 @@
-﻿using CodexClient;
+/* MARKETPLACE REMOVED
+using CodexClient;
 using CodexContractsPlugin;
 using CodexReleaseTests.Utils;
 using Nethereum.Hex.HexConvertors.Extensions;
@@ -48,11 +49,11 @@ namespace CodexReleaseTests.MarketTests
 
             client.Stop(waitTillStopped: true);
 
-            // Hold this situation 
+            // Hold this situation
             Log("Holding initial situation to ensure contract is stable...");
             var config = GetContracts().Deployment.Config;
             WaitAndCheckNodesStaysAlive(config.PeriodDuration * 5, hosts);
-            
+
             var requestState = GetContracts().GetRequestState(contract.PurchaseId.HexToByteArray());
             Assert.That(requestState, Is.Not.EqualTo(RequestState.Failed));
 
@@ -192,3 +193,4 @@ namespace CodexReleaseTests.MarketTests
         }
     }
 }
+*/

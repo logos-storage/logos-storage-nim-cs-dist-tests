@@ -1,4 +1,5 @@
-﻿using BlockchainUtils;
+/* MARKETPLACE REMOVED
+using BlockchainUtils;
 using CodexContractsPlugin;
 using CodexPlugin;
 using DistTestCore;
@@ -88,3 +89,4 @@ namespace CodexReleaseTests.MarketTests
         }
     }
 }
+*/

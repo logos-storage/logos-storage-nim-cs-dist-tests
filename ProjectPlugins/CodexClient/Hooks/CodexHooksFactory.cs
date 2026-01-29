@@ -62,7 +62,7 @@ namespace CodexClient.Hooks
         {
         }
 
-        public void OnStorageContractSubmitted(StoragePurchaseContract storagePurchaseContract)
+        public void OnStorageContractSubmitted(IStoragePurchaseContract storagePurchaseContract)
         {
         }
 

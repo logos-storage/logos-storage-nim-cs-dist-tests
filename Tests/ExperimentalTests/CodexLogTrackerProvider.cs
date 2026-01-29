@@ -61,7 +61,7 @@ namespace CodexTests
             {
             }
 
-            public void OnStorageContractSubmitted(StoragePurchaseContract storagePurchaseContract)
+            public void OnStorageContractSubmitted(IStoragePurchaseContract storagePurchaseContract)
             {
             }
 

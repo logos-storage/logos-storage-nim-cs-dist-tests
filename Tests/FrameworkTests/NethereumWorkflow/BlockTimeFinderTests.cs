@@ -1,4 +1,5 @@
-﻿using BlockchainUtils;
+/* MARKETPLACE REMOVED
+using BlockchainUtils;
 using Logging;
 using Moq;
 using NethereumWorkflow;
@@ -199,3 +200,4 @@ namespace FrameworkTests.NethereumWorkflow
         }
     }
 }
+*/

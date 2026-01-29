@@ -1,4 +1,5 @@
-﻿using GethPlugin;
+/* MARKETPLACE REMOVED
+using GethPlugin;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
@@ -44,3 +45,4 @@ namespace FrameworkTests.Utils
         }
     }
 }
+*/

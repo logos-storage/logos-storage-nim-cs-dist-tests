@@ -4,7 +4,7 @@ services:
       context: ..
       dockerfile: docker/Dockerfile
     environment:
-      - CODEXDOCKERIMAGE=codexstorage/nim-codex:sha-14c5270
+      - CODEXDOCKERIMAGE=logosstorage/logos-storage-nim:sha-14c5270
       - BRANCH="feature/docker-image-testruns"
       - KUBECONFIG=/opt/kubeconfig
       - LOGPATH=/opt/logs

@@ -1,4 +1,5 @@
-﻿using CodexClient;
+/* MARKETPLACE REMOVED
+using CodexClient;
 using CodexContractsPlugin.ChainMonitor;
 using CodexContractsPlugin.Marketplace;
 using CodexReleaseTests.Utils;
@@ -146,3 +147,4 @@ namespace CodexReleaseTests.MarketTests
         }
     }
 }
+*/
