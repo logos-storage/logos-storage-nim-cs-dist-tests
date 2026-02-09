@@ -4,3 +4,4 @@ bin
 .vscode
 Tools/AutoClient/datapath
 .editorconfig
+.DS_Store

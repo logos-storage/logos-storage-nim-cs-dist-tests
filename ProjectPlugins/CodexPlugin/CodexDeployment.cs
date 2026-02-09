@@ -1,6 +1,4 @@
 ﻿using CodexClient;
-// MARKETPLACE REMOVED: using CodexContractsPlugin;
-// MARKETPLACE REMOVED: using GethPlugin;
 using KubernetesWorkflow.Types;
 
 namespace CodexPlugin
@@ -14,7 +12,6 @@ namespace CodexPlugin
         {
             Id = id;
             CodexInstances = codexInstances;
-            // MARKETPLACE REMOVED: GethDeployment and CodexContractsDeployment
             PrometheusContainer = prometheusContainer;
             DiscordBotContainer = discordBotContainer;
             Metadata = metadata;
@@ -22,8 +19,6 @@ namespace CodexPlugin
 
         public string Id { get; }
         public CodexInstance[] CodexInstances { get; }
-        // MARKETPLACE REMOVED: public GethDeployment GethDeployment { get; }
-        // MARKETPLACE REMOVED: public CodexContractsDeployment CodexContractsDeployment { get; }
         public RunningPod? PrometheusContainer { get; }
         public RunningPod? DiscordBotContainer { get; }
         public DeploymentMetadata Metadata { get; }

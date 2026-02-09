@@ -5,7 +5,7 @@ using Utils;
 
 namespace CodexClient
 {
-    public partial interface ICodexNode : IHasEthAddress, IHasMetricsScrapeTarget
+    public partial interface ICodexNode : IHasMetricsScrapeTarget
     {
         string GetName();
         string GetImageName();
@@ -29,10 +29,7 @@ namespace CodexClient
         CodexSpace Space();
         void ConnectToPeer(ICodexNode node);
         DebugInfoVersion Version { get; }
-        IMarketplaceAccess Marketplace { get; }
         ITransferSpeeds TransferSpeeds { get; }
-        EthAccount EthAccount { get; }
-        StoragePurchase? GetPurchaseStatus(string purchaseId);
 
         Address GetDiscoveryEndpoint();
         Address GetApiEndpoint();
@@ -59,11 +56,10 @@ namespace CodexClient
         private readonly CodexAccess codexAccess;
         private readonly IFileManager fileManager;
 
-        public CodexNode(ILog log, CodexAccess codexAccess, IFileManager fileManager, IMarketplaceAccess marketplaceAccess, ICodexNodeHooks hooks)
+        public CodexNode(ILog log, CodexAccess codexAccess, IFileManager fileManager, ICodexNodeHooks hooks)
         {
             this.codexAccess = codexAccess;
             this.fileManager = fileManager;
-            Marketplace = marketplaceAccess;
             this.hooks = hooks;
             Version = new DebugInfoVersion();
             transferSpeeds = new TransferSpeeds();
@@ -73,7 +69,7 @@ namespace CodexClient
 
         public void Awake()
         {
-            hooks.OnNodeStarting(codexAccess.GetStartUtc(), codexAccess.GetImageName(), codexAccess.GetEthAccount());
+            hooks.OnNodeStarting(codexAccess.GetStartUtc(), codexAccess.GetImageName());
         }
 
         public void Initialize()
@@ -93,32 +89,8 @@ namespace CodexClient
             hooks.OnNodeStarted(this, peerId, nodeId);
         }
 
-        public IMarketplaceAccess Marketplace { get; }
         public DebugInfoVersion Version { get; private set; }
         public ITransferSpeeds TransferSpeeds { get => transferSpeeds; }
-
-        public StoragePurchase? GetPurchaseStatus(string purchaseId)
-        {
-            return codexAccess.GetPurchaseStatus(purchaseId);
-        }
-
-        public EthAddress EthAddress 
-        {
-            get
-            {
-                EnsureMarketplace();
-                return codexAccess.GetEthAccount()!.EthAddress;
-            }
-        }
-
-        public EthAccount EthAccount
-        {
-            get
-            {
-                EnsureMarketplace();
-                return codexAccess.GetEthAccount()!;
-            }
-        }
 
         public string GetName()
         {
@@ -333,14 +305,6 @@ namespace CodexClient
             log.AddStringReplace(CodexUtils.ToShortId(peerId), nodeName);
             log.AddStringReplace(nodeId, nodeName);
             log.AddStringReplace(CodexUtils.ToShortId(nodeId), nodeName);
-
-            var ethAccount = codexAccess.GetEthAccount();
-            if (ethAccount != null)
-            {
-                var addr = ethAccount.EthAddress.ToString();
-                log.AddStringReplace(addr, nodeName);
-                log.AddStringReplace(addr.ToLowerInvariant(), nodeName);
-            }
         }
 
         private string[] GetPeerMultiAddresses(CodexNode peer, DebugInfo peerInfo)
@@ -419,11 +383,6 @@ namespace CodexClient
                         $"Actual increase: {increase} " +
                         $"Actual used: {space.QuotaUsedBytes}");
             });
-        }
-
-        private void EnsureMarketplace()
-        {
-            if (codexAccess.GetEthAccount() == null) throw new Exception("Marketplace is not enabled for this Codex node. Please start it with the option '.EnableMarketplace(...)' to enable it.");
         }
 
         private void Log(string msg)

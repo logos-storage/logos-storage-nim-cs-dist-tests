@@ -30,7 +30,6 @@ namespace CodexPlugin
         {
             var rc = ci.DeployCodexNodes(number, setup);
             var result = ci.WrapCodexContainers(rc);
-            // MARKETPLACE REMOVED: Plugin(ci).WireUpMarketplace(result, setup);
             return result;
         }
 

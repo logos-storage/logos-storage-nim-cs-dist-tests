@@ -1,6 +1,5 @@
 ﻿using System.Net.Sockets;
 using System.Net;
-// MARKETPLACE REMOVED: using Nethereum.Util;
 
 namespace CodexPlugin
 {
@@ -98,19 +97,6 @@ namespace CodexPlugin
                 //AddPodAnnotation("prometheus.io/port", metricsPort.Number.ToString());
             }
 
-            if (config.SimulateProofFailures != null)
-            {
-                throw new Exception("Not supported");
-                //AddEnvVar("CODEX_SIMULATE_PROOF_FAILURES", config.SimulateProofFailures.ToString()!);
-            }
-
-            // MARKETPLACE REMOVED: MarketplaceConfig block
-            // if (config.MarketplaceConfig != null) { ... }
-
-            //if (!string.IsNullOrEmpty(config.NameOverride))
-            //{
-            //    AddEnvVar("CODEX_NODENAME", config.NameOverride);
-            //}
 
             return Create();
         }

@@ -49,23 +49,11 @@ namespace CodexTests
                 addNode(node);
             }
 
-            public void OnNodeStarting(DateTime startUtc, string image, EthAccount? ethAccount)
+            public void OnNodeStarting(DateTime startUtc, string image)
             {
             }
 
             public void OnNodeStopping()
-            {
-            }
-
-            public void OnStorageAvailabilityCreated(StorageAvailability response)
-            {
-            }
-
-            public void OnStorageContractSubmitted(IStoragePurchaseContract storagePurchaseContract)
-            {
-            }
-
-            public void OnStorageContractUpdated(StoragePurchase purchaseStatus)
             {
             }
         }

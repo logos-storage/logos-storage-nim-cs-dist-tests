@@ -1,20 +1,15 @@
-// MARKETPLACE REMOVED: using BlockchainUtils;
 using CodexClient;
-// MARKETPLACE REMOVED: using CodexContractsPlugin;
 using CodexNetDeployer;
 using CodexPlugin;
 using CodexPlugin.OverwatchSupport;
 using CodexTests.Helpers;
 using Core;
 using DistTestCore;
-using DistTestCore.Helpers;
 using DistTestCore.Logs;
-// MARKETPLACE REMOVED: using GethPlugin;
 using Logging;
 using MetricsPlugin;
 using Newtonsoft.Json;
 using NUnit.Framework;
-// MARKETPLACE REMOVED: using NUnit.Framework.Constraints;
 using OverwatchTranscript;
 using Utils;
 
@@ -22,15 +17,12 @@ namespace CodexTests
 {
     public class CodexDistTest : DistTest
     {
-        // MARKETPLACE REMOVED: private readonly BlockCache blockCache = new BlockCache();
         private readonly List<ICodexNode> nodes = new List<ICodexNode>();
         private CodexTranscriptWriter? writer;
 
         public CodexDistTest()
         {
             ProjectPlugin.Load<CodexPlugin.CodexPlugin>();
-            // MARKETPLACE REMOVED: ProjectPlugin.Load<CodexContractsPlugin.CodexContractsPlugin>();
-            // MARKETPLACE REMOVED: ProjectPlugin.Load<GethPlugin.GethPlugin>();
             ProjectPlugin.Load<MetricsPlugin.MetricsPlugin>();
         }
 
@@ -81,12 +73,6 @@ namespace CodexTests
             return group;
         }
 
-        // MARKETPLACE REMOVED: StartGethNode method
-        // public IGethNode StartGethNode(Action<IGethSetup> setup)
-        // {
-        //     return Ci.StartGethNode(blockCache, setup);
-        // }
-
         public PeerConnectionTestHelpers CreatePeerConnectionTestHelpers()
         {
             return new PeerConnectionTestHelpers(GetTestLog());
@@ -96,13 +82,6 @@ namespace CodexTests
         {
             return new PeerDownloadTestHelpers(GetTestLog(), GetFileManager());
         }
-
-        // MARKETPLACE REMOVED: AssertBalance method
-        // public void AssertBalance(ICodexContracts contracts, ICodexNode codexNode, Constraint constraint, string msg)
-        // {
-        //     Assert.Fail("Depricated, use MarketplaceAutobootstrapDistTest assertBalances instead.");
-        //     AssertHelpers.RetryAssert(constraint, () => contracts.GetTestTokenBalance(codexNode), nameof(AssertBalance) + msg);
-        // }
 
         public void CheckLogForErrors(params ICodexNode[] nodes)
         {

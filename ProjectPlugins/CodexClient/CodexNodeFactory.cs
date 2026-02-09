@@ -37,16 +37,10 @@ namespace CodexClient
             var processControl = processControlFactory.CreateProcessControl(instance);
             var access = new CodexAccess(log, httpFactory, processControl, instance);
             var hooks = hooksFactory.CreateHooks(access.GetName());
-            var marketplaceAccess = CreateMarketplaceAccess(instance, access, hooks);
-            var node =  new CodexNode(log, access, fileManager, marketplaceAccess, hooks);
+            var node =  new CodexNode(log, access, fileManager, hooks);
             node.Initialize();
             return node;
         }
 
-        private IMarketplaceAccess CreateMarketplaceAccess(ICodexInstance instance, CodexAccess access, ICodexNodeHooks hooks)
-        {
-            // MARKETPLACE REMOVED: always return unavailable
-            return new MarketplaceUnavailable();
-        }
     }
 }
