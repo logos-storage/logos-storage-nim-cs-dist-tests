@@ -17,7 +17,6 @@ namespace CodexClient
     {
         public string Version { get; set; } = string.Empty;
         public string Revision { get; set; } = string.Empty;
-        public string Contracts { get; set; } = string.Empty;
 
         public bool IsValid()
         {
@@ -68,19 +67,8 @@ namespace CodexClient
         public string RootHash { get; set; } = string.Empty;
         public ByteSize DatasetSize { get; set; } = ByteSize.Zero;
         public ByteSize BlockSize { get; set; } = ByteSize.Zero;
-        public bool Protected { get; set; }
     }
 
-    public class SalesRequestStorageRequest
-    {
-        public string Duration { get; set; } = string.Empty;
-        public string ProofProbability { get; set; } = string.Empty;
-        public string Reward { get; set; } = string.Empty;
-        public string Collateral { get; set; } = string.Empty;
-        public string? Expiry { get; set; }
-        public uint? Nodes { get; set; }
-        public uint? Tolerance { get; set; }
-    }
 
     public class ContentId
     {

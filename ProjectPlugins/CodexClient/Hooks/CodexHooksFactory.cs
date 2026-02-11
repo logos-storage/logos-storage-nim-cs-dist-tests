@@ -50,23 +50,11 @@ namespace CodexClient.Hooks
         {
         }
 
-        public void OnNodeStarting(DateTime startUtc, string image, EthAccount? ethAccount)
+        public void OnNodeStarting(DateTime startUtc, string image)
         {
         }
 
         public void OnNodeStopping()
-        {
-        }
-
-        public void OnStorageAvailabilityCreated(StorageAvailability response)
-        {
-        }
-
-        public void OnStorageContractSubmitted(StoragePurchaseContract storagePurchaseContract)
-        {
-        }
-
-        public void OnStorageContractUpdated(StoragePurchase purchaseStatus)
         {
         }
     }

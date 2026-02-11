@@ -32,9 +32,7 @@ namespace CodexReleaseTests.DataTests
             var local1 = localFiles.Content.Single(f => f.Cid == cid1);
             var local2 = localFiles.Content.Single(f => f.Cid == cid2);
 
-            Assert.That(local1.Manifest.Protected, Is.False);
             Assert.That(local1.Manifest.DatasetSize, Is.EqualTo(size1));
-            Assert.That(local2.Manifest.Protected, Is.False);
             Assert.That(local2.Manifest.DatasetSize, Is.EqualTo(size2));
         }
     }

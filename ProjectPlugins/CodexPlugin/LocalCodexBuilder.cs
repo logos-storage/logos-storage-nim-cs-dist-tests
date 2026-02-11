@@ -54,7 +54,7 @@ namespace CodexNetDeployer
             var customImage = GenerateImageName();
             Docker($"build", "-t", customImage, "-f", "./codex.Dockerfile",
                 "--build-arg=\"MAKE_PARALLEL=4\"",
-                "--build-arg=\"NIMFLAGS=-d:disableMarchNative -d:codex_enable_api_debug_peers=true -d:codex_enable_api_debug_fetch=true -d:codex_enable_simulated_proof_failures\"",
+                "--build-arg=\"NIMFLAGS=-d:disableMarchNative -d:storage_enable_api_debug_peers=true -d:storage_enable_api_debug_fetch=true\"",
                 "--build-arg=\"NAT_IP_AUTO=true\"",
                 "..");
 

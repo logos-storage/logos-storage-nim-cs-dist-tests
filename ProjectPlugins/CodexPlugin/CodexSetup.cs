@@ -1,6 +1,4 @@
 ﻿using CodexClient;
-using CodexContractsPlugin;
-using GethPlugin;
 using KubernetesWorkflow;
 using Utils;
 
@@ -18,20 +16,7 @@ namespace CodexPlugin
         ICodexSetup WithBlockMaintenanceInterval(TimeSpan duration);
         ICodexSetup WithBlockMaintenanceNumber(int numberOfBlocks);
         ICodexSetup EnableMetrics();
-        ICodexSetup EnableMarketplace(IGethNode gethNode, ICodexContracts codexContracts, Action<IMarketplaceSetup> marketplaceSetup);
-        /// <summary>
-        /// Provides an invalid proof every N proofs
-        /// </summary>
-        ICodexSetup WithSimulateProofFailures(uint failEveryNProofs);
         ICodexSetup AsPublicTestNet(CodexTestNetConfig testNetConfig);
-    }
-
-    public interface IMarketplaceSetup
-    {
-        IMarketplaceSetup WithInitial(Ether eth, TestToken tokens);
-        IMarketplaceSetup WithAccount(EthAccount account);
-        IMarketplaceSetup AsStorageNode();
-        IMarketplaceSetup AsValidator();
     }
 
     public class CodexLogCustomTopics
@@ -127,21 +112,6 @@ namespace CodexPlugin
             return this;
         }
 
-        public ICodexSetup EnableMarketplace(IGethNode gethNode, ICodexContracts codexContracts, Action<IMarketplaceSetup> marketplaceSetup)
-        {
-            var ms = new MarketplaceSetup();
-            marketplaceSetup(ms);
-
-            MarketplaceConfig = new MarketplaceInitialConfig(ms, gethNode, codexContracts);
-            return this;
-        }
-
-        public ICodexSetup WithSimulateProofFailures(uint failEveryNProofs)
-        {
-            SimulateProofFailures = failEveryNProofs;
-            return this;
-        }
-
         public ICodexSetup AsPublicTestNet(CodexTestNetConfig testNetConfig)
         {
             PublicTestNet = testNetConfig;
@@ -160,85 +130,6 @@ namespace CodexPlugin
             yield return $"LogLevel={LogLevelWithTopics()}";
             if (BootstrapSpr != null) yield return $"BootstrapNode={BootstrapSpr}";
             if (StorageQuota != null) yield return $"StorageQuota={StorageQuota}";
-            if (SimulateProofFailures != null) yield return $"SimulateProofFailures={SimulateProofFailures}";
-            if (MarketplaceConfig != null) yield return $"MarketplaceSetup={MarketplaceConfig.MarketplaceSetup}";
-        }
-    }
-
-    public class MarketplaceSetup : IMarketplaceSetup
-    {
-        public bool IsStorageNode { get; private set; }
-        public bool IsValidator { get; private set; }
-        public Ether InitialEth { get; private set; } = 0.Eth();
-        public TestToken InitialTestTokens { get; private set; } = 0.Tst();
-        public EthAccountSetup EthAccountSetup { get; } = new EthAccountSetup();
-
-        public IMarketplaceSetup AsStorageNode()
-        {
-            IsStorageNode = true;
-            return this;
-        }
-
-        public IMarketplaceSetup AsValidator()
-        {
-            IsValidator = true;
-            return this;
-        }
-
-        public IMarketplaceSetup WithAccount(EthAccount account)
-        {
-            EthAccountSetup.Pin(account);
-            return this;
-        }
-
-        public IMarketplaceSetup WithInitial(Ether eth, TestToken tokens)
-        {
-            InitialEth = eth;
-            InitialTestTokens = tokens;
-            return this;
-        }
-
-        public override string ToString()
-        {
-            var result = "[(clientNode)"; // When marketplace is enabled, being a clientNode is implicit.
-            result += IsStorageNode ? "(storageNode)" : "()";
-            result += IsValidator ? "(validator)" : "() ";
-            result += $"Pinned address: '{EthAccountSetup}' ";
-            result += $"{InitialEth} / {InitialTestTokens}";
-            result += "] ";
-            return result;
-        }
-    }
-
-    public class EthAccountSetup
-    {
-        private readonly List<EthAccount> accounts = new List<EthAccount>();
-        private bool pinned = false;
-
-        public void Pin(EthAccount account)
-        {
-            accounts.Add(account);
-            pinned = true;
-        }
-
-        public EthAccount GetNew()
-        {
-            if (pinned) return accounts.Last();
-
-            var a = EthAccountGenerator.GenerateNew();
-            accounts.Add(a);
-            return a;
-        }
-
-        public EthAccount[] GetAll()
-        {
-            return accounts.ToArray();
-        }
-
-        public override string ToString()
-        {
-            if (!accounts.Any()) return "NoEthAccounts";
-            return string.Join(",", accounts.Select(a => a.ToString()).ToArray());
         }
     }
 }

@@ -25,9 +25,6 @@ namespace CodexPlugin.OverwatchSupport
         public BlockReceivedEvent? BlockReceived { get; set; }
         public PeerDialSuccessfulEvent? DialSuccessful { get; set; }
         public PeerDroppedEvent? PeerDropped { get; set; }
-        public StorageContractSubmittedEvent? StorageContractSubmitted { get; set; }
-        public StorageContractUpdatedEvent? StorageContractUpdated { get; set; }
-        public StorageAvailabilityCreatedEvent? StorageAvailabilityCreated { get; set; }
 
         public void Write(DateTime utc, ITranscriptWriter writer)
         {
@@ -72,7 +69,6 @@ namespace CodexPlugin.OverwatchSupport
     public class NodeStartingEvent
     {
         public string Image { get; set; } = string.Empty;
-        public string EthAddress { get; set; } = string.Empty;
     }
 
     [Serializable]
@@ -117,25 +113,6 @@ namespace CodexPlugin.OverwatchSupport
     {
         public string Cid { get; set; } = string.Empty;
         public long ByteSize { get; set; }
-    }
-
-    [Serializable]
-    public class StorageAvailabilityCreatedEvent
-    {
-        public StorageAvailability StorageAvailability { get; set; } = null!;
-    }
-
-    [Serializable]
-    public class StorageContractUpdatedEvent
-    {
-        public StoragePurchase StoragePurchase { get; set; } = null!;
-    }
-
-    [Serializable]
-    public class StorageContractSubmittedEvent
-    {
-        public string PurchaseId { get; set; } = string.Empty;
-        public StoragePurchaseRequest PurchaseRequest { get; set; } = null!;
     }
 
     #endregion

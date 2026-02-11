@@ -20,14 +20,13 @@ namespace CodexPlugin.OverwatchSupport
             this.name = name;
         }
 
-        public void OnNodeStarting(DateTime startUtc, string image, EthAccount? ethAccount)
+        public void OnNodeStarting(DateTime startUtc, string image)
         {
             WriteCodexEvent(startUtc, e =>
             {
                 e.NodeStarting = new NodeStartingEvent
                 {
                     Image = image,
-                    EthAddress = ethAccount != null ? ethAccount.ToString() : ""
                 };
             });
         }
@@ -104,40 +103,6 @@ namespace CodexPlugin.OverwatchSupport
                     UniqueId = uid,
                     Cid = cid.Id,
                     ByteSize = size.SizeInBytes
-                };
-            });
-        }
-
-        public void OnStorageContractSubmitted(StoragePurchaseContract storagePurchaseContract)
-        {
-            WriteCodexEvent(e =>
-            {
-                e.StorageContractSubmitted = new StorageContractSubmittedEvent
-                {
-                    PurchaseId = storagePurchaseContract.PurchaseId,
-                    PurchaseRequest = storagePurchaseContract.Purchase
-                };
-            });
-        }
-
-        public void OnStorageContractUpdated(StoragePurchase purchaseStatus)
-        {
-            WriteCodexEvent(e =>
-            {
-                e.StorageContractUpdated = new StorageContractUpdatedEvent
-                {
-                    StoragePurchase = purchaseStatus
-                };
-            });
-        }
-
-        public void OnStorageAvailabilityCreated(StorageAvailability response)
-        {
-            WriteCodexEvent(e =>
-            {
-                e.StorageAvailabilityCreated = new StorageAvailabilityCreatedEvent
-                {
-                    StorageAvailability = response
                 };
             });
         }

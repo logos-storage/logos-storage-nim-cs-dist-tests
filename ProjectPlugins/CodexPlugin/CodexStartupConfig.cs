@@ -12,10 +12,8 @@ namespace CodexPlugin
         public CodexLogCustomTopics? CustomTopics { get; set; } = new CodexLogCustomTopics(CodexLogLevel.Info, CodexLogLevel.Warn);
         public ByteSize? StorageQuota { get; set; }
         public bool MetricsEnabled { get; set; }
-        public MarketplaceInitialConfig? MarketplaceConfig { get; set; }
         public string? BootstrapSpr { get; set; }
         public int? BlockTTL { get; set; }
-        public uint? SimulateProofFailures { get; set; }
         public bool? EnableValidator { get; set; }
         public TimeSpan? BlockMaintenanceInterval { get; set; }
         public int? BlockMaintenanceNumber { get; set; }
@@ -70,21 +68,11 @@ namespace CodexPlugin
                     "blockexcnetwork",
                     "blockexcnetworkpeer"
                 };
-                var contractClockTopics = new[]
-                {
-                    "contracts",
-                    "clock"
-                };
                 var jsonSerializeTopics = new[]
                 {
                     "serde",
                     "json",
                     "serialization"
-                };
-                var marketplaceInfraTopics = new[]
-                {
-                    "JSONRPC-WS-CLIENT",
-                    "JSONRPC-HTTP-CLIENT",
                 };
 
                 var alwaysIgnoreTopics = new []
@@ -95,9 +83,7 @@ namespace CodexPlugin
                 level = $"{level};" +
                     $"{CustomTopics.DiscV5.ToString()!.ToLowerInvariant()}:{string.Join(",", discV5Topics)};" +
                     $"{CustomTopics.Libp2p.ToString()!.ToLowerInvariant()}:{string.Join(",", libp2pTopics)};" +
-                    $"{CustomTopics.ContractClock.ToString().ToLowerInvariant()}:{string.Join(",", contractClockTopics)};" +
                     $"{CustomTopics.JsonSerialize.ToString().ToLowerInvariant()}:{string.Join(",", jsonSerializeTopics)};" +
-                    $"{CustomTopics.MarketplaceInfra.ToString().ToLowerInvariant()}:{string.Join(",", marketplaceInfraTopics)};" +
                     $"{CodexLogLevel.Error.ToString()}:{string.Join(",", alwaysIgnoreTopics)}";
 
                 if (CustomTopics.BlockExchange != null)

@@ -9,6 +9,8 @@ namespace CodexClient
 {
     public class CodexAccess
     {
+        public const string API_BASE_URL = "/api/storage/v1";
+
         private readonly ILog log;
         private readonly IHttpFactory httpFactory;
         private readonly IProcessControl processControl;
@@ -142,35 +144,10 @@ namespace CodexClient
             return mapper.Map(OnCodex(api => api.ListDataAsync()));
         }
 
-        public StorageAvailability SalesAvailability(CreateStorageAvailability request)
-        {
-            var body = mapper.Map(request);
-            var read = OnCodex(api => api.OfferStorageAsync(body));
-            return mapper.Map(read);
-        }
-
-        public StorageAvailability[] GetAvailabilities()
-        {
-            var collection = OnCodex(api => api.GetAvailabilitiesAsync());
-            return mapper.Map(collection);
-        }
-
-        public string RequestStorage(StoragePurchaseRequest request)
-        {
-            var body = mapper.Map(request);
-            return OnCodex(api => api.CreateStorageRequestAsync(request.ContentId.Id, body));
-        }
-
         public CodexSpace Space()
         {
             var space = OnCodex(api => api.SpaceAsync());
             return mapper.Map(space);
-        }
-
-        public StoragePurchase? GetPurchaseStatus(string purchaseId)
-        {
-            var purchase = OnCodex(api => api.GetPurchaseAsync(purchaseId));
-            return mapper.Map(purchase);
         }
 
         public string GetName()
@@ -203,11 +180,6 @@ namespace CodexClient
             return instance.MetricsEndpoint;
         }
 
-        public EthAccount? GetEthAccount()
-        {
-            return instance.EthAccount;
-        }
-
         public void DeleteDataDirFolder()
         {
             processControl.DeleteDataDirFolder();
@@ -236,7 +208,7 @@ namespace CodexClient
         {
             var address = GetAddress();
             var api = new CodexApiClient(client);
-            api.BaseUrl = $"{address.Host}:{address.Port}/api/codex/v1";
+            api.BaseUrl = $"{address.Host}:{address.Port}{API_BASE_URL}";
             return CrashCheck(() => Time.Wait(action(api)));
         }
 
@@ -256,7 +228,7 @@ namespace CodexClient
         {
             return httpFactory
                 .CreateHttp(GetHttpId(), h => CheckContainerCrashed())
-                .CreateEndpoint(GetAddress(), "/api/codex/v1/", GetName());
+                .CreateEndpoint(GetAddress(), $"{API_BASE_URL}/", GetName());
         }
 
         private Address GetAddress()

@@ -45,7 +45,7 @@ namespace CodexPlugin
 
             try
             {
-                var dataDirVar = container.Recipe.EnvVars.Single(e => e.Name == "CODEX_DATA_DIR");
+                var dataDirVar = container.Recipe.EnvVars.Single(e => e.Name == "STORAGE_DATA_DIR");
                 var dataDir = dataDirVar.Value;
                 var workflow = tools.CreateWorkflow();
                 workflow.ExecuteCommand(container, "rm", "-Rfv", $"/codex/{dataDir}/repo");

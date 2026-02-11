@@ -1,20 +1,15 @@
-﻿using BlockchainUtils;
 using CodexClient;
-using CodexContractsPlugin;
 using CodexNetDeployer;
 using CodexPlugin;
 using CodexPlugin.OverwatchSupport;
 using CodexTests.Helpers;
 using Core;
 using DistTestCore;
-using DistTestCore.Helpers;
 using DistTestCore.Logs;
-using GethPlugin;
 using Logging;
 using MetricsPlugin;
 using Newtonsoft.Json;
 using NUnit.Framework;
-using NUnit.Framework.Constraints;
 using OverwatchTranscript;
 using Utils;
 
@@ -22,15 +17,12 @@ namespace CodexTests
 {
     public class CodexDistTest : DistTest
     {
-        private readonly BlockCache blockCache = new BlockCache();
         private readonly List<ICodexNode> nodes = new List<ICodexNode>();
         private CodexTranscriptWriter? writer;
 
         public CodexDistTest()
         {
             ProjectPlugin.Load<CodexPlugin.CodexPlugin>();
-            ProjectPlugin.Load<CodexContractsPlugin.CodexContractsPlugin>();
-            ProjectPlugin.Load<GethPlugin.GethPlugin>();
             ProjectPlugin.Load<MetricsPlugin.MetricsPlugin>();
         }
 
@@ -81,11 +73,6 @@ namespace CodexTests
             return group;
         }
 
-        public IGethNode StartGethNode(Action<IGethSetup> setup)
-        {
-            return Ci.StartGethNode(blockCache, setup);
-        }
-
         public PeerConnectionTestHelpers CreatePeerConnectionTestHelpers()
         {
             return new PeerConnectionTestHelpers(GetTestLog());
@@ -94,12 +81,6 @@ namespace CodexTests
         public PeerDownloadTestHelpers CreatePeerDownloadTestHelpers()
         {
             return new PeerDownloadTestHelpers(GetTestLog(), GetFileManager());
-        }
-
-        public void AssertBalance(ICodexContracts contracts, ICodexNode codexNode, Constraint constraint, string msg)
-        {
-            Assert.Fail("Depricated, use MarketplaceAutobootstrapDistTest assertBalances instead.");
-            AssertHelpers.RetryAssert(constraint, () => contracts.GetTestTokenBalance(codexNode), nameof(AssertBalance) + msg);
         }
 
         public void CheckLogForErrors(params ICodexNode[] nodes)

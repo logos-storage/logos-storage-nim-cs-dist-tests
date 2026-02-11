@@ -1,21 +1,17 @@
 ﻿using CodexClient;
-using CodexContractsPlugin;
-using GethPlugin;
 using KubernetesWorkflow.Types;
 
 namespace CodexPlugin
 {
     public class CodexDeployment
     {
-        public CodexDeployment(CodexInstance[] codexInstances, GethDeployment gethDeployment,
-            CodexContractsDeployment codexContractsDeployment, RunningPod? prometheusContainer,
+        public CodexDeployment(CodexInstance[] codexInstances,
+            RunningPod? prometheusContainer,
             RunningPod? discordBotContainer, DeploymentMetadata metadata,
             string id)
         {
             Id = id;
             CodexInstances = codexInstances;
-            GethDeployment = gethDeployment;
-            CodexContractsDeployment = codexContractsDeployment;
             PrometheusContainer = prometheusContainer;
             DiscordBotContainer = discordBotContainer;
             Metadata = metadata;
@@ -23,8 +19,6 @@ namespace CodexPlugin
 
         public string Id { get; }
         public CodexInstance[] CodexInstances { get; }
-        public GethDeployment GethDeployment { get; }
-        public CodexContractsDeployment CodexContractsDeployment { get; }
         public RunningPod? PrometheusContainer { get; }
         public RunningPod? DiscordBotContainer { get; }
         public DeploymentMetadata Metadata { get; }

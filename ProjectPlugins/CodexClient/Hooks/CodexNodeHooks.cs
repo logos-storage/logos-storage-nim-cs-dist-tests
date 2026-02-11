@@ -4,16 +4,13 @@ namespace CodexClient.Hooks
 {
     public interface ICodexNodeHooks
     {
-        void OnNodeStarting(DateTime startUtc, string image, EthAccount? ethAccount);
+        void OnNodeStarting(DateTime startUtc, string image);
         void OnNodeStarted(ICodexNode node, string peerId, string nodeId);
         void OnNodeStopping();
         void OnFileUploading(string uid, ByteSize size);
         void OnFileUploaded(string uid, ByteSize size, ContentId cid);
         void OnFileDownloading(ContentId cid);
         void OnFileDownloaded(ByteSize size, ContentId cid);
-        void OnStorageContractSubmitted(StoragePurchaseContract storagePurchaseContract);
-        void OnStorageContractUpdated(StoragePurchase purchaseStatus);
-        void OnStorageAvailabilityCreated(StorageAvailability response);
     }
 
     public class MuxingCodexNodeHooks : ICodexNodeHooks
@@ -50,29 +47,14 @@ namespace CodexClient.Hooks
             foreach (var h in backingHooks) h.OnNodeStarted(node, peerId, nodeId);
         }
 
-        public void OnNodeStarting(DateTime startUtc, string image, EthAccount? ethAccount)
+        public void OnNodeStarting(DateTime startUtc, string image)
         {
-            foreach (var h in backingHooks) h.OnNodeStarting(startUtc, image, ethAccount);
+            foreach (var h in backingHooks) h.OnNodeStarting(startUtc, image);
         }
 
         public void OnNodeStopping()
         {
             foreach (var h in backingHooks) h.OnNodeStopping();
-        }
-
-        public void OnStorageAvailabilityCreated(StorageAvailability response)
-        {
-            foreach (var h in backingHooks) h.OnStorageAvailabilityCreated(response);
-        }
-
-        public void OnStorageContractSubmitted(StoragePurchaseContract storagePurchaseContract)
-        {
-            foreach (var h in backingHooks) h.OnStorageContractSubmitted(storagePurchaseContract);
-        }
-
-        public void OnStorageContractUpdated(StoragePurchase purchaseStatus)
-        {
-            foreach (var h in backingHooks) h.OnStorageContractUpdated(purchaseStatus);
         }
     }
 }

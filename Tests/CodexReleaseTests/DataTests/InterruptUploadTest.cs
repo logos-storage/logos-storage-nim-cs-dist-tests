@@ -39,7 +39,7 @@ namespace CodexReleaseTests.DataTests
         private Process StartCurlUploadProcess(ICodexNode node, TrackedFile file)
         {
             var apiAddress = node.GetApiEndpoint();
-            var codexUrl = $"{apiAddress}/api/codex/v1/data";
+            var codexUrl = $"{apiAddress}/api/storage/v1/data";
             var filePath = file.Filename;
             return Process.Start("curl", $"-X POST {codexUrl} -H \"Content-Type: application/octet-stream\" -T {filePath}");
         }
