@@ -17,9 +17,9 @@ on:
 jobs:
   build-and-push:
     name: Build and Push
-    uses: codex-storage/github-actions/.github/workflows/docker-reusable.yml@master
+    uses: logos-storage/github-actions/.github/workflows/docker-reusable.yml@master
     with:
       docker_file: docker/Dockerfile
-      dockerhub_repo: codexstorage/cs-codex-dist-tests
+      dockerhub_repo: logosstorage/cs-codex-dist-tests
       tag_latest: ${{ github.ref_name == github.event.repository.default_branch || startsWith(github.ref, 'refs/tags/') }}
     secrets: inherit
