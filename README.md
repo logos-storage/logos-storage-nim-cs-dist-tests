@@ -2,9 +2,9 @@
 
 This project allows you to write tools and tests that control and interact with container-based applications to form a distributed system in a controlled, reproducible environment.
 
-Dotnet: v8.0  
-Kubernetes: v1.25.4  
-Dotnet-kubernetes SDK: v10.1.4 https://github.com/kubernetes-client/csharp  
+Dotnet: v10.0  
+Kubernetes: v1.34.1  
+Dotnet-kubernetes SDK: v18.0.3 https://github.com/kubernetes-client/csharp  
 Nethereum: v4.14.0
 
 Currently, this project is mainly used for distributed testing of [Nim-Codex](https://github.com/codex-storage/nim-codex). However, its plugin-structure allows for other projects to be on-boarded (relatively) easily. (See 'contribute a plugin`.)
