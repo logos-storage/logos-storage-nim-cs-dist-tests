@@ -71,7 +71,7 @@ namespace ExperimentalTests.BasicTests
             {
                 foreach (var value in metric.Values)
                 {
-                    if (value.Value > highest)
+                    if (value.Value >= highest)
                     {
                         highest = value.Value;
                         result = metric;
