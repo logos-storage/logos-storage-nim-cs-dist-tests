@@ -22,7 +22,7 @@ spec:
         workload-type: "tests-runners-ci"
       containers:
       - name: runner
-        image: codexstorage/cs-codex-dist-tests:latest
+        image: logosstorage/cs-codex-dist-tests:latest
         imagePullPolicy: Always
         resources:
           requests:
