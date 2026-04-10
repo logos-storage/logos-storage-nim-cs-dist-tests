@@ -1,5 +1,4 @@
 ﻿using Core;
-using IdentityModel;
 using KubernetesWorkflow.Types;
 using Logging;
 using System.Globalization;
@@ -212,7 +211,7 @@ namespace MetricsPlugin
             MakeLine(lines, e =>
             {
                 e.Add("Metrics");
-                foreach (var ts in allTimestamps) e.Add(ts.ToEpochTime().ToString());
+                foreach (var ts in allTimestamps) e.Add(ts.ToUnixTimeSeconds().ToString());
             });
 
             foreach (var set in Sets)
