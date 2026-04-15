@@ -7,8 +7,6 @@ BRANCH="${BRANCH:-master}"
 FOLDER="${FOLDER:-/opt/logos-storage-dist-tests}"
 
 ## Tests specific
-DEPLOYMENT_CODEXNETDEPLOYER_PATH="${DEPLOYMENT_CODEXNETDEPLOYER_PATH:-Tools/CodexNetDeployer}"
-DEPLOYMENT_CODEXNETDEPLOYER_RUNNER="${DEPLOYMENT_CODEXNETDEPLOYER_RUNNER:-deploy-continuous-testnet.sh}"
 CONTINUOUS_TESTS_FOLDER="${CONTINUOUS_TESTS_FOLDER:-Tests/LogosStorageContinuousTests}"
 CONTINUOUS_TESTS_RUNNER="${CONTINUOUS_TESTS_RUNNER:-run.sh}"
 
@@ -22,9 +20,6 @@ cd "${FOLDER}"
 echo -e "Running tests from branch '$(git branch --show-current) ($(git rev-parse --short HEAD))'\n"
 
 if [[ "${TESTS_TYPE}" == "continuous-tests" ]]; then
-  echo -e "Running CodexNetDeployer\n"
-  bash "${DEPLOYMENT_CODEXNETDEPLOYER_PATH}"/"${DEPLOYMENT_CODEXNETDEPLOYER_RUNNER}"
-  echo
   echo -e "Running continuous-tests\n"
   bash "${CONTINUOUS_TESTS_FOLDER}"/"${CONTINUOUS_TESTS_RUNNER}"
 else
