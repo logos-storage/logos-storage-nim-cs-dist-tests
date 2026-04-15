@@ -2,14 +2,14 @@
 
 # Variables
 ## Common
-SOURCE="${SOURCE:-https://github.com/codex-storage/cs-codex-dist-tests.git}"
+SOURCE="${SOURCE:-https://github.com/logos-storage/logos-storage-nim-cs-dist-tests.git}"
 BRANCH="${BRANCH:-master}"
-FOLDER="${FOLDER:-/opt/cs-codex-dist-tests}"
+FOLDER="${FOLDER:-/opt/logos-storage-dist-tests}"
 
 ## Tests specific
 DEPLOYMENT_CODEXNETDEPLOYER_PATH="${DEPLOYMENT_CODEXNETDEPLOYER_PATH:-Tools/CodexNetDeployer}"
 DEPLOYMENT_CODEXNETDEPLOYER_RUNNER="${DEPLOYMENT_CODEXNETDEPLOYER_RUNNER:-deploy-continuous-testnet.sh}"
-CONTINUOUS_TESTS_FOLDER="${CONTINUOUS_TESTS_FOLDER:-Tests/CodexContinuousTests}"
+CONTINUOUS_TESTS_FOLDER="${CONTINUOUS_TESTS_FOLDER:-Tests/LogosStorageContinuousTests}"
 CONTINUOUS_TESTS_RUNNER="${CONTINUOUS_TESTS_RUNNER:-run.sh}"
 
 # Get code

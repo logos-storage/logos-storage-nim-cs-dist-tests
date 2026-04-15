@@ -1,10 +1,10 @@
-﻿using CodexClient;
-using CodexPlugin.OverwatchSupport;
+﻿using LogosStorageClient;
+using StoragePlugin.OverwatchSupport;
 using OverwatchTranscript;
 
 namespace TranscriptAnalysis.Receivers
 {
-    public class NodesDegree : BaseReceiver<OverwatchCodexEvent>
+    public class NodesDegree : BaseReceiver<OverwatchLogosStorageEvent>
     {
         public class Dial
         {
@@ -50,7 +50,7 @@ namespace TranscriptAnalysis.Receivers
 
         public override string Name => "NodesDegree";
 
-        public override void Receive(ActivateEvent<OverwatchCodexEvent> @event)
+        public override void Receive(ActivateEvent<OverwatchLogosStorageEvent> @event)
         {
             if (@event.Payload.DialSuccessful != null)
             {
@@ -109,8 +109,8 @@ namespace TranscriptAnalysis.Receivers
 
         private void AddDial(string peerId, string targetPeerId)
         {
-            peerId = CodexUtils.ToShortId(peerId);
-            targetPeerId = CodexUtils.ToShortId(targetPeerId);
+            peerId = LogosStorageUtils.ToShortId(peerId);
+            targetPeerId = LogosStorageUtils.ToShortId(targetPeerId);
 
             var peer = GetNode(peerId);
             var target = GetNode(targetPeerId); ;

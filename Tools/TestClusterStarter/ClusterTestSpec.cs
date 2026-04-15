@@ -14,20 +14,20 @@ namespace TestClusterStarter
 
     public class ClusterTestSpec
     {
-        public ClusterTestSpec(string name, string filter, int replication, int durationSeconds, string? codexImageOverride)
+        public ClusterTestSpec(string name, string filter, int replication, int durationSeconds, string? logosStorageImageOverride)
         {
             Name = name;
             Filter = filter;
             Replication = replication;
             DurationSeconds = durationSeconds;
-            CodexImageOverride = codexImageOverride;
+            LogosStorageImageOverride = logosStorageImageOverride;
         }
 
         public string Name { get; }
         public string Filter { get; }
         public int Replication { get; }
         public int DurationSeconds { get; }
-        public string? CodexImageOverride { get; }
+        public string? LogosStorageImageOverride { get; }
     }
 
     public class ClusterTestDeployment

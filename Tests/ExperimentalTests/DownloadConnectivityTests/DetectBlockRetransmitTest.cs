@@ -1,4 +1,4 @@
-﻿using CodexTests;
+﻿using LogosStorageTests;
 using NUnit.Framework;
 using Utils;
 
@@ -15,7 +15,7 @@ namespace ExperimentalTests.DownloadConnectivityTests
             [Values(3, 5, 10, 20)] int numNodes
         )
         {
-            var nodes = StartCodex(numNodes);
+            var nodes = StartLogosStorage(numNodes);
             var file = GenerateTestFile(fileSize.MB());
             var cid = nodes[0].UploadFile(file);
 

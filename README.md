@@ -7,7 +7,7 @@ Kubernetes: v1.34.1
 Dotnet-kubernetes SDK: v18.0.3 https://github.com/kubernetes-client/csharp  
 Nethereum: v4.14.0
 
-Currently, this project is mainly used for distributed testing of [Nim-Codex](https://github.com/codex-storage/nim-codex). However, its plugin-structure allows for other projects to be on-boarded (relatively) easily. (See 'contribute a plugin`.)
+Currently, this project is mainly used for distributed testing of [Logos Storage](https://github.com/logos-storage/logos-storage-nim). However, its plugin-structure allows for other projects to be on-boarded (relatively) easily. (See 'contribute a plugin`.)
 
 ## Tests/DistTestCore
 Library with generic distributed-testing functionality. Uses NUnit3. Reference this project to build unit-test style scenarios: setup, run test, teardown. The DistTestCore responds to the following env-vars:
@@ -15,13 +15,13 @@ Library with generic distributed-testing functionality. Uses NUnit3. Reference t
 - `DATAFILEPATH` = Path where (temporary) data files will be stored.
 - `ALWAYS_LOGS` = When set, DistTestCore will always download all container logs at the end of a test run. By default, logs are only downloaded on test failure.
 
-## Tests/CodexTests and Tests/CodexLongTests
-These are test assemblies that use DistTestCore to perform tests against transient Codex nodes.
-Read more [HERE](/Tests/CodexTests/README.md)
+## Tests/LogosStorageTests and Tests/LogosStorageLongTests
+These are test assemblies that use DistTestCore to perform tests against transient Logos Storage nodes.
+Read more [HERE](/Tests/LogosStorageTests/README.md)
 
 ## Tests/ContinuousTests
-A console application that runs tests in an endless loop against a persistent deployment of Codex nodes.
-Read more [HERE](/Tests/CodexContinuousTests/README.md)
+A console application that runs tests in an endless loop against a persistent deployment of Logos Storage nodes.
+Read more [HERE](/Tests/LogosStorageContinuousTests/README.md)
 
 ## Framework architecture
 The framework is designed to be extended by project-specific plugins. These plugins contribute functionality and abstractions to the framework. Users of the framework use these to perform tasks such as testing and deploying.

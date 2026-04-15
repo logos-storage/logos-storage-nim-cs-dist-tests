@@ -4,7 +4,7 @@ public class Program
 {
     public static void Main(string[] args)
     {
-        args = ["d:\\CodexTestLogs\\BlockExchange\\experiment2-fetchbatched"];
+        args = ["d:\\LogosStorageTestLogs\\BlockExchange\\experiment2-fetchbatched"];
         var p = new Program(args[0]);
         p.Run();
     }

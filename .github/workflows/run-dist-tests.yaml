@@ -21,7 +21,7 @@ on:
         required: false
         type: string
       command:
-        description: Command (dotnet test Tests/CodexTests)
+        description: Command (dotnet test Tests/LogosStorageTests)
         required: false
         type: string
 
@@ -31,7 +31,7 @@ env:
   BRANCH: ${{ github.ref_name }}
   NAMEPREFIX: d-tests-runner
   NAMESPACE: default
-  COMMAND: dotnet test Tests/CodexTests
+  COMMAND: dotnet test Tests/LogosStorageTests
   JOB_MANIFEST: docker/job-dist-tests.yaml
   KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
   KUBE_VERSION: v1.28.2

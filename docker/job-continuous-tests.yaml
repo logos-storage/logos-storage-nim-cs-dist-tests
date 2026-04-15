@@ -22,7 +22,7 @@ spec:
         workload-type: "tests-runners-ci"
       containers:
       - name: ${NAMEPREFIX}-runner
-        image: codexstorage/cs-codex-dist-tests:latest
+        image: logosstorage/logos-storage-dist-tests:latest
         imagePullPolicy: Always
         resources:
           requests:
@@ -31,7 +31,7 @@ spec:
         - name: KUBECONFIG
           value: "/opt/kubeconfig.yaml"
         - name: LOGPATH
-          value: "/var/log/codex-continuous-tests/${DEPLOYMENT_NAMESPACE}"
+          value: "/var/log/storage-continuous-tests/${DEPLOYMENT_NAMESPACE}"
         - name: NAMESPACE
           value: "${NAMESPACE}"
         - name: BRANCH
@@ -40,8 +40,8 @@ spec:
           value: "${SOURCE}"
         - name: RUNID
           value: "${RUNID}"
-        - name: CODEXDOCKERIMAGE
-          value: "${CODEXDOCKERIMAGE}"
+        - name: STORAGEDOCKERIMAGE
+          value: "${STORAGEDOCKERIMAGE}"
         - name: TESTID
           value: "${TESTID}"
         - name: DEPLOYMENT_NAMESPACE
@@ -59,12 +59,12 @@ spec:
           mountPath: /opt/kubeconfig.yaml
           subPath: kubeconfig.yaml
         - name: logs
-          mountPath: /var/log/codex-continuous-tests
+          mountPath: /var/log/storage-continuous-tests
       restartPolicy: Never
       volumes:
         - name: kubeconfig
           secret:
-            secretName: codex-dist-tests-app-kubeconfig
+            secretName: storage-dist-tests-app-kubeconfig
         - name: logs
           hostPath:
-            path: /var/log/codex-continuous-tests
+            path: /var/log/storage-continuous-tests

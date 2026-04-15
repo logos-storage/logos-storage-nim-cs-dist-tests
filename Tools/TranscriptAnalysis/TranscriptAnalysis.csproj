@@ -9,7 +9,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Framework\OverwatchTranscript\OverwatchTranscript.csproj" />
-    <ProjectReference Include="..\..\ProjectPlugins\CodexPlugin\CodexPlugin.csproj" />
+    <ProjectReference Include="..\..\ProjectPlugins\StoragePlugin\StoragePlugin.csproj" />
   </ItemGroup>
 
 </Project>

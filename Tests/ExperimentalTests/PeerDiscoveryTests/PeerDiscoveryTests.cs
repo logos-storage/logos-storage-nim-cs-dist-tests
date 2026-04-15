@@ -1,7 +1,7 @@
-using CodexClient;
+using LogosStorageClient;
 using NUnit.Framework;
 using Utils;
-using CodexTests;
+using LogosStorageTests;
 
 namespace ExperimentalTests.PeerDiscoveryTests
 {
@@ -12,7 +12,7 @@ namespace ExperimentalTests.PeerDiscoveryTests
         public void CanReportUnknownPeerId()
         {
             var unknownId = "16Uiu2HAkv2CHWpff3dj5iuVNERAp8AGKGNgpGjPexJZHSqUstfsK";
-            var node = StartCodex();
+            var node = StartLogosStorage();
 
             var result = node.GetDebugPeer(unknownId);
             Assert.That(result.IsPeerFound, Is.False);
@@ -21,7 +21,7 @@ namespace ExperimentalTests.PeerDiscoveryTests
         [Test]
         public void MetricsDoesNotInterfereWithPeerDiscovery()
         {
-            var nodes = StartCodex(2, s => s.EnableMetrics());
+            var nodes = StartLogosStorage(2, s => s.EnableMetrics());
 
             AssertAllNodesConnected(nodes);
         }
@@ -31,12 +31,12 @@ namespace ExperimentalTests.PeerDiscoveryTests
         [TestCase(10)]
         public void VariableNodes(int number)
         {
-            var nodes = StartCodex(number);
+            var nodes = StartLogosStorage(number);
 
             AssertAllNodesConnected(nodes);
         }
 
-        private void AssertAllNodesConnected(IEnumerable<ICodexNode> nodes)
+        private void AssertAllNodesConnected(IEnumerable<IStorageNode> nodes)
         {
             nodes = nodes.Concat(new[] { BootstrapNode }).ToArray()!;
 
@@ -44,7 +44,7 @@ namespace ExperimentalTests.PeerDiscoveryTests
             CheckRoutingTable(nodes);
         }
 
-        private void CheckRoutingTable(IEnumerable<ICodexNode> allNodes)
+        private void CheckRoutingTable(IEnumerable<IStorageNode> allNodes)
         {
             var allResponses = allNodes.Select(n => n.GetDebugInfo()).ToArray();
 

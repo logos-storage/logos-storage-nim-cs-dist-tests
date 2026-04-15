@@ -181,7 +181,7 @@ namespace DistTestCore
         {
             if (IsRunningInCluster())
             {
-                Log(" > Detected we're running in the cluster. Using long webCall timeset.");
+                fixtureLog.Log(" > Detected we're running in the cluster. Using long webCall timeset.");
                 return new LongWebCallTimeSet();
             }
 
@@ -193,7 +193,7 @@ namespace DistTestCore
         {
             if (IsRunningInCluster())
             {
-                Log(" > Detected we're running in the cluster. Using long kubernetes timeset.");
+                fixtureLog.Log(" > Detected we're running in the cluster. Using long kubernetes timeset.");
                 return new LongK8sTimeSet();
             }
 

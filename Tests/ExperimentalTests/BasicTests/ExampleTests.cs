@@ -1,6 +1,6 @@
-﻿using CodexClient;
-using CodexPlugin;
-using CodexTests;
+﻿using LogosStorageClient;
+using StoragePlugin;
+using LogosStorageTests;
 using DistTestCore;
 using MetricsPlugin;
 using NUnit.Framework;
@@ -9,12 +9,12 @@ using Utils;
 namespace ExperimentalTests.BasicTests
 {
     [TestFixture]
-    public class ExampleTests : CodexDistTest
+    public class ExampleTests : LogosStorageDistTest
     {
         [Test]
-        public void CodexLogExample()
+        public void LogosStorageLogExample()
         {
-            var primary = StartCodex(s => s.WithLogLevel(CodexLogLevel.Trace, new CodexLogCustomTopics(CodexLogLevel.Warn, CodexLogLevel.Warn)));
+            var primary = StartLogosStorage(s => s.WithLogLevel(LogosStorageLogLevel.Trace, new LogosStorageLogCustomTopics(LogosStorageLogLevel.Warn, LogosStorageLogLevel.Warn)));
 
             var cid = primary.UploadFile(GenerateTestFile(5.MB()));
 
@@ -29,8 +29,8 @@ namespace ExperimentalTests.BasicTests
         [Test]
         public void TwoMetricsExample()
         {
-            var group = StartCodex(2, s => s.EnableMetrics());
-            var group2 = StartCodex(2, s => s.EnableMetrics());
+            var group = StartLogosStorage(2, s => s.EnableMetrics());
+            var group2 = StartLogosStorage(2, s => s.EnableMetrics());
 
             var primary = group[0];
             var secondary = group[1];

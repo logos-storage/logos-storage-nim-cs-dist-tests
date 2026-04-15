@@ -2,19 +2,19 @@
 {
     public class ApplicationIds
     {
-        public ApplicationIds(string codexId, string gethId, string prometheusId, string codexContractsId, string grafanaId)
+        public ApplicationIds(string logosStorageId, string gethId, string prometheusId, string logosStorageContractsId, string grafanaId)
         {
-            CodexId = codexId;
+            LogosStorageId = logosStorageId;
             GethId = gethId;
             PrometheusId = prometheusId;
-            CodexContractsId = codexContractsId;
+            LogosStorageContractsId = logosStorageContractsId;
             GrafanaId = grafanaId;
         }
 
-        public string CodexId { get; }
+        public string LogosStorageId { get; }
         public string GethId { get; }
         public string PrometheusId { get; }
-        public string CodexContractsId { get; }
+        public string LogosStorageContractsId { get; }
         public string GrafanaId { get; }
     }
 }

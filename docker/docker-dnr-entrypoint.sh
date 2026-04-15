@@ -1,5 +1,5 @@
 #!/bin/bash
 echo "Running continuous tests..."
-cd /app/Tests/CodexContinuousTests
+cd /app/Tests/LogosStorageContinuousTests
 exec "$@"
 

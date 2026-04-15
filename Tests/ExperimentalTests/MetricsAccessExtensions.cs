@@ -3,7 +3,7 @@ using Logging;
 using MetricsPlugin;
 using NUnit.Framework.Constraints;
 
-namespace CodexTests
+namespace LogosStorageTests
 {
     public static class MetricsAccessExtensions
     {

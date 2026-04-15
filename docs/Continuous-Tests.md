@@ -12,8 +12,7 @@
 
  Usually, we are running Continuous Tests manually and for automated runs, please refer to the [Tests automation](Automation.md).
 
- We have two projects in the repository
- - [CodexNetDeployer](../CodexNetDeployer) - Prepare environment to run the tests
+ There is one project in the repository:
  - [ContinuousTests](../ContinuousTests) - Continuous Tests
 
  And they are used to prepare environment and run Continuous Tests.
@@ -53,15 +52,15 @@
       #     mountPath: /opt/kubeconfig.yaml
       #     subPath: kubeconfig.yaml
       #   - name: logs
-      #     mountPath: /var/log/codex-dist-tests
+      #     mountPath: /var/log/storage-dist-tests
         command: ["sleep", "infinity"]
       # volumes:
       #   - name: kubeconfig
       #     secret:
-      #       secretName: codex-dist-tests-app-kubeconfig
+      #       secretName: storage-dist-tests-app-kubeconfig
       #   - name: logs
       #     hostPath:
-      #       path: /var/log/codex-dist-tests
+      #       path: /var/log/storage-dist-tests
     ```
 
     ```shell
@@ -70,7 +69,7 @@
 
  2. Copy kubeconfig to the runner Pod using the name you set in the previous step
     ```shell
-    kubectl cp ~/.kube/codex-dist-tests.yaml tests-runner:/opt/kubeconfig.yaml
+    kubectl cp ~/.kube/storage-dist-tests.yaml tests-runner:/opt/kubeconfig.yaml
     ```
 
  3. Exec into the runner Pod using the name you set in the previous step
@@ -93,26 +92,12 @@
     tmux
 
     cd /opt
-    git clone https://github.com/codex-storage/cs-codex-dist-tests.git
+    git clone https://github.com/logos-storage/logos-storage-dist-tests.git
     ```
 
- 6. Run `CodexNetDeployer`
+ 6. Run `ContinuousTests`
     ```shell
-    # Usually take ~ 10 minutes
-    cd cs-codex-dist-tests/Tools/CodexNetDeployer
-
-    # Adjust values
-    vi deploy-continuous-testnet.sh
-
-    # Deploy Codex Netwotk
-    export RUNID=$(date +%Y%m%d-%H%M%S)
-    bash deploy-continuous-testnet.sh
-    ```
-
- 7. Run `ContinuousTests`
-    ```shell
-    cd ../../Tests/CodexContinuousTests
-    cp ../../Tools/CodexNetDeployer/codex-deployment.json .
+    cd ../../Tests/LogosStorageContinuousTests
 
     # Adjust values
     vi run.sh
@@ -121,7 +106,7 @@
     bash run.sh
     ```
 
- 8. [Tmux sessions](https://tmuxcheatsheet.com)
+ 7. [Tmux sessions](https://tmuxcheatsheet.com)
     ```shell
     # Detach
     Ctrl + b --> d
@@ -136,4 +121,4 @@
 
 ## Analyze logs
 
- We should check the logs in the `/opt/cs-codex-dist-tests/Tests/CodexContinuousTests/logs` folder
+ We should check the logs in the `/opt/logos-storage-dist-tests/Tests/LogosStorageContinuousTests/logs` folder

@@ -11,11 +11,11 @@
 
 ## Description
 
- The goal of [Distributed System Tests for Nim-Codex](../../) is to test how [Codex](https://codex.storage) works in different topologies in the distributed network and to be able to detect regressions during development.
+ The goal of [Distributed System Tests for Logos Storage](../../) is to test how Logos Storage works in different topologies in the distributed network and to be able to detect regressions during development.
 
  We can [run Tests locally](LOCALSETUP.md) and it works well, but in order to scale that we may need to run Tests in an automatic way using remote Kubernetes cluster.
 
- Initially, we are considering to run dist-tests on [nim-codex](https://github.com/codex-storage/nim-codex) master branch merge, to be able to determine regressions. And we also working on [Continuous Tests](Continuous-Tests.md) which are called to detect issues on continuous Codex runs.
+ Initially, we are considering to run dist-tests on [logos-storage-nim](https://github.com/logos-storage/logos-storage-nim) master branch merge, to be able to determine regressions. And we also working on [Continuous Tests](Continuous-Tests.md) which are called to detect issues on continuous Logos Storage runs.
 
 
 ## Architecture
@@ -35,7 +35,7 @@ GitHub --> CI --> Kubernetes -->  Job                  |
  3. Job run Dist-Tests runner Pod with specified parameters
  4. Dists-Tests runner run the tests from inside the Kubernetes and generate the logs
  5. Vector ship the logs of the Dists-Tests Pods
- 6. Prometheus collect the metrics of the Dists-Tests Codex Pods
+ 6. Prometheus collect the metrics of the Dists-Tests Logos Storage Pods
  7. We can see the status of the Dist-Test
 
 
@@ -43,7 +43,7 @@ GitHub --> CI --> Kubernetes -->  Job                  |
 
 | Component                               | Description                             |
 | --------------------------------------- | --------------------------------------- |
-| [cs-codex-dist-tests](/)                | Distributed System Tests                |
+| [logos-storage-dist-tests](/)                | Distributed System Tests                |
 | [Kubernetes](https://kubernetes.io)     | Environment where we run Tests          |
 | [Vector](https://vector.dev)            | Ship logs to the Elasticsearch          |
 | [Elasticsearch](https://www.elastic.co) | Store and index logs                    |
@@ -116,15 +116,15 @@ GitHub --> CI --> Kubernetes -->  Job                  |
           mountPath: /opt/kubeconfig.yaml
           subPath: kubeconfig.yaml
         - name: logs
-          mountPath: /var/log/cs-codex-dist-tests
+          mountPath: /var/log/logos-storage-dist-tests
       restartPolicy: Never
       volumes:
         - name: kubeconfig
           secret:
-            secretName: cs-codex-dist-tests-app-kubeconfig
+            secretName: logos-storage-dist-tests-app-kubeconfig
         - name: logs
           hostPath:
-            path: /var/log/cs-codex-dist-tests
+            path: /var/log/logos-storage-dist-tests
     ```
     </details>
 
@@ -145,7 +145,7 @@ GitHub --> CI --> Kubernetes -->  Job                  |
     ```shell
     folder="/opt/dist-tests"
 
-    git clone https://github.com/codex-storage/cs-codex-dist-tests.git $folder
+    git clone https://github.com/logos-storage/logos-storage-dist-tests.git $folder
     cd $folder
     ```
 
@@ -153,7 +153,7 @@ GitHub --> CI --> Kubernetes -->  Job                  |
     ```shell
     # RUNNERLOCATION                              # defined at Pod creation
     # KUBECONFIG                                  # defined at Pod creation
-    export LOGPATH="/var/log/cs-codex-dist-tests" # Logs from that location will be send in Elasticsearch
+    export LOGPATH="/var/log/logos-storage-dist-tests" # Logs from that location will be send in Elasticsearch
     export RUNID=$(date +%Y%m%d-%H%M%S)           # Run ID to show in Kibana/Grafana
     export TESTID=$(git rev-parse --short HEAD)   # Test ID to show in Kibana/Grafana
     ```
@@ -170,7 +170,7 @@ GitHub --> CI --> Kubernetes -->  Job                  |
     dotnet test LongTests
 
     # Specific test
-    dotnet test --filter=CodexLogExample
+    dotnet test --filter=LogosStorageLogExample
     ```
 
  6. We can see in OpenLens Pods started by dist-tests app
@@ -180,7 +180,7 @@ GitHub --> CI --> Kubernetes -->  Job                  |
 
 ### Run tests automatically
 
- Now we use GitHub Actions to trigger dist-tests run manually and considering to run them on [nim-codex](https://github.com/codex-storage/nim-codex) master branch merge.
+ Now we use GitHub Actions to trigger dist-tests run manually and considering to run them on [logos-storage-nim](https://github.com/logos-storage/logos-storage-nim) master branch merge.
 
  **It works in the following way**
  1. Github Actions secrets contains [kubeconfig to interact with the Kubernetes cluster](../../../issues/19).
@@ -190,7 +190,7 @@ GitHub --> CI --> Kubernetes -->  Job                  |
     - `namespace`  - Namespace where Dist-test runner will de created
     - `nameprefix` - Dist-test runner name prefix
 
- 3. Kubernetes Job will run the Pod with a custom [Docker image](/docker/Dockerfile) - [codexstorage/cs-codex-dist-tests](https://hub.docker.com/r/codexstorage/cs-codex-dist-tests/tags).  
+ 3. Kubernetes Job will run the Pod with a custom [Docker image](/docker/Dockerfile) - [logosstorage/logos-storage-dist-tests](https://hub.docker.com/r/logosstorage/logos-storage-dist-tests/tags).  
   Image [entrypoint](/docker/docker-entrypoint.sh) is customizable and we can pass the following variables
     - `SOURCE` - Dist-tests source repository, useful when we work with forks - `default="current repository"`
     - `BRANCH` - Repository branch, useful when we would like to run tests from the custom branch - `default="master"`
@@ -202,7 +202,7 @@ GitHub --> CI --> Kubernetes -->  Job                  |
     ```shell
     RUNNERLOCATION=InternalToCluster
     KUBECONFIG=/opt/kubeconfig.yaml
-    LOGPATH=/var/log/cs-codex-dist-tests
+    LOGPATH=/var/log/logos-storage-dist-tests
     NAMESPACE=default
     SOURCE=current repository
     BRANCH=master
@@ -212,7 +212,7 @@ GitHub --> CI --> Kubernetes -->  Job                  |
 
  5. Dist-tests runner will use [kubeconfig to interact with the Kubernetes and run the tests](../../../issues/21), which is set by `KUBECONFIG` variable.
 
- 6. Runner will execute all tests and will write the logs to the `/var/log/cs-codex-dist-tests` folder.
+ 6. Runner will execute all tests and will write the logs to the `/var/log/logos-storage-dist-tests` folder.
 
  7. Kubernetes Job status will be changed from `Running` to the `Completed` or `Failed`.
 
@@ -225,7 +225,7 @@ GitHub --> CI --> Kubernetes -->  Job                  |
 
  > **Note:** This part is not finished yet and it is under development
 
- We use Elasticsearch to store and discover the logs of the tests execution and Codex Pods which are run during the tests.
+ We use Elasticsearch to store and discover the logs of the tests execution and Logos Storage Pods which are run during the tests.
 
  We can use [Kibana](#kibana) to discover all the logs and [Grafana](#grafana) to see tests execution status.
 
@@ -234,8 +234,8 @@ GitHub --> CI --> Kubernetes -->  Job                  |
 
  | App     | URL                                                                          | Authentication |
  | ------- | ---------------------------------------------------------------------------- | -------------- |
- | Kibana  | [kibana.dist-tests.codex.storage](https://kibana.dist-tests.codex.storage)   | GitHub account |
- | Grafana | [grafana.dist-tests.codex.storage](https://grafana.dist-tests.codex.storage) | GitHub account |
+ | Kibana  | [kibana.dist-tests.logos.storage](https://kibana.dist-tests.logos.storage)   | GitHub account |
+ | Grafana | [grafana.dist-tests.logos.storage](https://grafana.dist-tests.logos.storage) | GitHub account |
 
 
 #### Kibana

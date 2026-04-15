@@ -1,8 +1,8 @@
-﻿using CodexClient;
+﻿using LogosStorageClient;
 using Logging;
-using static CodexTests.Helpers.FullConnectivityHelper;
+using static LogosStorageTests.Helpers.FullConnectivityHelper;
 
-namespace CodexTests.Helpers
+namespace LogosStorageTests.Helpers
 {
     public class PeerConnectionTestHelpers : IFullConnectivityImplementation
     {
@@ -13,7 +13,7 @@ namespace CodexTests.Helpers
             helper = new FullConnectivityHelper(log, this);
         }
 
-        public void AssertFullyConnected(IEnumerable<ICodexNode> nodes)
+        public void AssertFullyConnected(IEnumerable<IStorageNode> nodes)
         {
             helper.AssertFullyConnected(nodes);
         }

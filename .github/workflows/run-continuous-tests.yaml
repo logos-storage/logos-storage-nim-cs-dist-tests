@@ -44,7 +44,7 @@ on:
         required: false
         type: string
       storagedockerimage:
-        description: Codex Docker image (logosstorage/logos-storage-nim:latest-dist-tests)
+        description: Logos Storage Docker image (logosstorage/logos-storage-nim:latest-dist-tests)
         required: false
         type: string
       nameprefix:

@@ -4,7 +4,7 @@ services:
       context: ..
       dockerfile: docker/Dockerfile
     environment:
-      - CODEXDOCKERIMAGE=logosstorage/logos-storage-nim:sha-14c5270
+      - STORAGEDOCKERIMAGE=logosstorage/logos-storage-nim:sha-14c5270
       - BRANCH="feature/docker-image-testruns"
       - KUBECONFIG=/opt/kubeconfig
       - LOGPATH=/opt/logs
@@ -13,7 +13,7 @@ services:
   continuous-test-run:
     image: thatbenbierens/dist-tests-deployandrun:initial
     environment:
-      # - CODEXDOCKERIMAGE=imageoverride
+      # - STORAGEDOCKERIMAGE=imageoverride
       - DNR_REP=3
       - DNR_NAME=Tryout
       - DNR_FILTER=PeernBeer

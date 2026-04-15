@@ -13,8 +13,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\ProjectPlugins\CodexDiscordBotPlugin\CodexDiscordBotPlugin.csproj" />
-    <ProjectReference Include="..\..\ProjectPlugins\CodexPlugin\CodexPlugin.csproj" />
+    <ProjectReference Include="..\..\ProjectPlugins\LogosStorageDiscordBotPlugin\LogosStorageDiscordBotPlugin.csproj" />
+    <ProjectReference Include="..\..\ProjectPlugins\StoragePlugin\StoragePlugin.csproj" />
     <ProjectReference Include="..\..\ProjectPlugins\MetricsPlugin\MetricsPlugin.csproj" />
     <ProjectReference Include="..\DistTestCore\DistTestCore.csproj" />
   </ItemGroup>

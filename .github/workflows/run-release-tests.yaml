@@ -36,7 +36,7 @@ env:
   NAMEPREFIX: r-tests
   NAMESPACE: default
   JOB_MANIFEST: docker/job-release-tests.yaml
-  COMMAND: dotnet test Tests/CodexReleaseTests
+  COMMAND: dotnet test Tests/LogosStorageReleaseTests
   KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
   KUBE_VERSION: v1.30.5
 

@@ -1,19 +1,19 @@
-﻿using CodexClient;
-using CodexTests;
+﻿using LogosStorageClient;
+using LogosStorageTests;
 using NUnit.Framework;
 
 namespace ExperimentalTests.PeerDiscoveryTests
 {
     [TestFixture]
-    public class LayeredDiscoveryTests : CodexDistTest
+    public class LayeredDiscoveryTests : LogosStorageDistTest
     {
         [Test]
         public void TwoLayersTest()
         {
-            var root = StartCodex();
-            var l1Source = StartCodex(s => s.WithBootstrapNode(root));
-            var l1Node = StartCodex(s => s.WithBootstrapNode(root));
-            var l2Target = StartCodex(s => s.WithBootstrapNode(l1Node));
+            var root = StartLogosStorage();
+            var l1Source = StartLogosStorage(s => s.WithBootstrapNode(root));
+            var l1Node = StartLogosStorage(s => s.WithBootstrapNode(root));
+            var l2Target = StartLogosStorage(s => s.WithBootstrapNode(l1Node));
 
             AssertAllNodesConnected(root, l1Source, l1Node, l2Target);
         }
@@ -21,11 +21,11 @@ namespace ExperimentalTests.PeerDiscoveryTests
         [Test]
         public void ThreeLayersTest()
         {
-            var root = StartCodex();
-            var l1Source = StartCodex(s => s.WithBootstrapNode(root));
-            var l1Node = StartCodex(s => s.WithBootstrapNode(root));
-            var l2Node = StartCodex(s => s.WithBootstrapNode(l1Node));
-            var l3Target = StartCodex(s => s.WithBootstrapNode(l2Node));
+            var root = StartLogosStorage();
+            var l1Source = StartLogosStorage(s => s.WithBootstrapNode(root));
+            var l1Node = StartLogosStorage(s => s.WithBootstrapNode(root));
+            var l2Node = StartLogosStorage(s => s.WithBootstrapNode(l1Node));
+            var l3Target = StartLogosStorage(s => s.WithBootstrapNode(l2Node));
 
             AssertAllNodesConnected(root, l1Source, l1Node, l2Node, l3Target);
         }
@@ -35,20 +35,20 @@ namespace ExperimentalTests.PeerDiscoveryTests
         [TestCase(10)]
         public void NodeChainTest(int chainLength)
         {
-            var nodes = new List<ICodexNode>();
-            var node = StartCodex();
+            var nodes = new List<IStorageNode>();
+            var node = StartLogosStorage();
             nodes.Add(node);
 
             for (var i = 1; i < chainLength; i++)
             {
-                node = StartCodex(s => s.WithBootstrapNode(node));
+                node = StartLogosStorage(s => s.WithBootstrapNode(node));
                 nodes.Add(node);
             }
 
             AssertAllNodesConnected(nodes.ToArray());
         }
 
-        private void AssertAllNodesConnected(params ICodexNode[] nodes)
+        private void AssertAllNodesConnected(params IStorageNode[] nodes)
         {
             CreatePeerConnectionTestHelpers().AssertFullyConnected(nodes);
         }
