@@ -1,5 +1,5 @@
-﻿using CodexClient;
-using CodexTests;
+﻿using LogosStorageClient;
+using LogosStorageTests;
 using FileUtils;
 using Logging;
 using NUnit.Framework;
@@ -30,7 +30,7 @@ namespace ExperimentalTests.DownloadConnectivityTests
         private void RunThePlan(Plan plan, int fileSizeMb)
         {
             foreach (var filePlan in plan.FilePlans) filePlan.File = GenerateTestFile(fileSizeMb.MB());
-            var nodes = StartCodex(plan.NodePlans.Count);
+            var nodes = StartLogosStorage(plan.NodePlans.Count);
             for (int i = 0; i < plan.NodePlans.Count; i++) plan.NodePlans[i].Node = nodes[i];
 
             // Upload all files to their nodes.
@@ -112,7 +112,7 @@ namespace ExperimentalTests.DownloadConnectivityTests
         }
 
         public int Number { get; }
-        public ICodexNode? Node { get; set; }
+        public IStorageNode? Node { get; set; }
         public List<FilePlan> Uploads { get; } = new List<FilePlan>();
         public List<FilePlan> Downloads { get; } = new List<FilePlan>();
 

@@ -1,5 +1,5 @@
-﻿using CodexClient;
-using CodexPlugin;
+﻿using LogosStorageClient;
+using StoragePlugin;
 using DistTestCore;
 using NUnit.Framework;
 using Utils;
@@ -13,12 +13,12 @@ namespace ExperimentalTests.UtilityTests
     [Ignore("Disabled until a solution is implemented.")]
     public class NetworkIsolationTest : DistTest
     {
-        private ICodexNode? node = null;
+        private IStorageNode? node = null;
 
         [Test]
         public void SetUpANodeAndWait()
         {
-            node = Ci.StartCodexNode();
+            node = Ci.StartStorageNode();
 
             Time.WaitUntil(() => node == null, TimeSpan.FromMinutes(5), TimeSpan.FromSeconds(5), nameof(SetUpANodeAndWait));
         }
@@ -26,7 +26,7 @@ namespace ExperimentalTests.UtilityTests
         [Test]
         public void ForeignNodeConnects()
         {
-            var myNode = Ci.StartCodexNode();
+            var myNode = Ci.StartStorageNode();
 
             Time.WaitUntil(() => node != null, TimeSpan.FromMinutes(1), TimeSpan.FromSeconds(5), nameof(ForeignNodeConnects));
 
@@ -41,7 +41,7 @@ namespace ExperimentalTests.UtilityTests
                 return;
             }
 
-            Assert.Fail("Connection could be established between two Codex nodes running in different namespaces. " +
+            Assert.Fail("Connection could be established between two Logos Storage nodes running in different namespaces. " +
                 "This may cause cross-test interference. Network isolation policy should be applied. Test infra failure.");
         }
     }

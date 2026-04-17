@@ -12,9 +12,9 @@ namespace DeployAndRunPlugin
         {
             var setup = config.Get<RunConfig>();
 
-            if (setup.CodexImageOverride != null)
+            if (setup.LogosStorageImageOverride != null)
             {
-                AddEnvVar("CODEXDOCKERIMAGE", setup.CodexImageOverride);
+                AddEnvVar("STORAGEDOCKERIMAGE", setup.LogosStorageImageOverride);
             }
 
             AddEnvVar("DNR_REP", setup.Replications.ToString());
@@ -23,28 +23,28 @@ namespace DeployAndRunPlugin
             AddEnvVar("DNR_DURATION", setup.Duration.TotalSeconds.ToString());
 
             AddEnvVar("KUBECONFIG", "/opt/kubeconfig.yaml");
-            AddEnvVar("LOGPATH", "/var/log/codex-continuous-tests");
+            AddEnvVar("LOGPATH", "/var/log/storage-continuous-tests");
 
-            AddVolume(name: "kubeconfig", mountPath: "/opt/kubeconfig.yaml", subPath: "kubeconfig.yaml", secret: "codex-dist-tests-app-kubeconfig");
-            AddVolume(name: "logs", mountPath: "/var/log/codex-continuous-tests", hostPath: "/var/log/codex-continuous-tests");
+            AddVolume(name: "kubeconfig", mountPath: "/opt/kubeconfig.yaml", subPath: "kubeconfig.yaml", secret: "storage-dist-tests-app-kubeconfig");
+            AddVolume(name: "logs", mountPath: "/var/log/storage-continuous-tests", hostPath: "/var/log/storage-continuous-tests");
         }
     }
 
     public class RunConfig
     {
-        public RunConfig(string name, string filter, TimeSpan duration, int replications, string? codexImageOverride = null)
+        public RunConfig(string name, string filter, TimeSpan duration, int replications, string? logosStorageImageOverride = null)
         {
             Name = name;
             Filter = filter;
             Duration = duration;
             Replications = replications;
-            CodexImageOverride = codexImageOverride;
+            LogosStorageImageOverride = logosStorageImageOverride;
         }
 
         public string Name { get; }
         public string Filter { get; }
         public TimeSpan Duration { get; }
         public int Replications { get; }
-        public string? CodexImageOverride { get; }
+        public string? LogosStorageImageOverride { get; }
     }
 }

@@ -304,10 +304,7 @@ namespace KubernetesWorkflow
                                 {
                                     new V1NetworkPolicyPort
                                     {
-                                        Port = new IntstrIntOrString
-                                        {
-                                            Value = "53"
-                                        },
+                                        Port = 53,
                                         Protocol = "UDP"
                                     }
                                 }
@@ -328,18 +325,12 @@ namespace KubernetesWorkflow
                                 {
                                     new V1NetworkPolicyPort
                                     {
-                                        Port = new IntstrIntOrString
-                                        {
-                                            Value = "80"
-                                        },
+                                        Port = 80,
                                         Protocol = "TCP"
                                     },
                                     new V1NetworkPolicyPort
                                     {
-                                        Port = new IntstrIntOrString
-                                        {
-                                            Value = "443"
-                                        },
+                                        Port = 443,
                                         Protocol = "TCP"
                                     }
                                 }
@@ -642,10 +633,10 @@ namespace KubernetesWorkflow
             };
         }
 
-        private V1ResourceRequirements CreateVolumeResourceRequirements(VolumeMount v)
+        private V1VolumeResourceRequirements CreateVolumeResourceRequirements(VolumeMount v)
         {
             if (v.ResourceQuantity == null) return null!;
-            return new V1ResourceRequirements
+            return new V1VolumeResourceRequirements
             {
                 Requests = new Dictionary<string, ResourceQuantity>()
                 {

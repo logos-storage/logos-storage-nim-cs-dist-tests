@@ -6,7 +6,7 @@ namespace MetricsPlugin
     public class PrometheusContainerRecipe : ContainerRecipeFactory
     {
         public override string AppName => "prometheus";
-        public override string Image => "codexstorage/dist-tests-prometheus:latest";
+        public override string Image => "logosstorage/dist-tests-prometheus:latest";
 
         public const string PortTag = "prometheus_port_tag";
 

@@ -1,5 +1,5 @@
-﻿using CodexClient;
-using CodexTests;
+﻿using LogosStorageClient;
+using LogosStorageTests;
 using NUnit.Framework;
 using Utils;
 
@@ -11,7 +11,7 @@ namespace ExperimentalTests.DownloadConnectivityTests
         [Test]
         public void MetricsDoesNotInterfereWithPeerDownload()
         {
-            var nodes = StartCodex(2, s => s.EnableMetrics());
+            var nodes = StartLogosStorage(2, s => s.EnableMetrics());
 
             AssertAllNodesConnected(nodes);
         }
@@ -22,12 +22,12 @@ namespace ExperimentalTests.DownloadConnectivityTests
             [Values(2, 5)] int numberOfNodes,
             [Values(1, 10)] int sizeMBs)
         {
-            var nodes = StartCodex(numberOfNodes);
+            var nodes = StartLogosStorage(numberOfNodes);
 
             AssertAllNodesConnected(nodes, sizeMBs);
         }
 
-        private void AssertAllNodesConnected(IEnumerable<ICodexNode> nodes, int sizeMBs = 10)
+        private void AssertAllNodesConnected(IEnumerable<IStorageNode> nodes, int sizeMBs = 10)
         {
             CreatePeerDownloadTestHelpers().AssertFullDownloadInterconnectivity(nodes, sizeMBs.MB());
         }

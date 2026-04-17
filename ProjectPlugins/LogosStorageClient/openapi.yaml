@@ -1,0 +1,548 @@
+openapi: 3.0.3
+
+info:
+  version: 0.0.1
+  title: Logos Storage API
+  description: "List of endpoints and interfaces available to Logos Storage API users"
+
+security:
+  - {}
+
+components:
+  schemas:
+    MultiAddress:
+      type: string
+      description: Address of node as specified by the multi-address specification https://multiformats.io/multiaddr/
+      example: /ip4/127.0.0.1/tcp/8080
+
+    PeerId:
+      type: string
+      description: Peer Identity reference as specified at https://docs.libp2p.io/concepts/fundamentals/peers/
+      example: QmYyQSo1c1Ym7orWxLYvCrM2EmxFTANf8wXmmE7DWjhx5N
+
+    Id:
+      type: string
+      description: 32bits identifier encoded in hex-decimal string.
+      minLength: 66
+      maxLength: 66
+      example: 0x...
+
+    Cid:
+      type: string
+      description: Content Identifier as specified at https://github.com/multiformats/cid
+      example: QmYyQSo1c1Ym7orWxLYvCrM2EmxFTANf8wXmmE7DWjhx5N
+
+    LogLevel:
+      type: string
+      description: "One of the log levels: TRACE, DEBUG, INFO, NOTICE, WARN, ERROR or FATAL"
+      example: DEBUG
+
+    SPR:
+      type: string
+      description: Signed Peer Record (libp2p)
+
+    SPRRead:
+      type: object
+      required:
+        - spr
+      properties:
+        spr:
+          $ref: "#/components/schemas/SPR"
+
+    PeerIdRead:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/PeerId"
+
+    Node:
+      type: object
+      required:
+       - nodeId
+       - peerId
+       - record
+       - address
+       - seen
+      properties:
+        nodeId:
+          type: string
+        peerId:
+          type: string
+        record:
+          type: string
+        address:
+          type: string
+        seen:
+          type: boolean
+
+    StorageVersion:
+      type: object
+      properties:
+        version:
+          type: string
+          example: v0.1.7
+        revision:
+          type: string
+          example: 0c647d8
+
+    PeersTable:
+      type: object
+      required:
+       - localNode
+       - nodes
+      properties:
+        localNode:
+          $ref: "#/components/schemas/Node"
+        nodes:
+          type: array
+          items:
+            $ref: "#/components/schemas/Node"
+
+    DebugInfo:
+      type: object
+      required:
+        - id
+        - addrs
+        - repo
+        - spr
+        - announceAddresses
+        - table
+        - storage
+      properties:
+        id:
+          $ref: "#/components/schemas/PeerId"
+        addrs:
+          type: array
+          items:
+            $ref: "#/components/schemas/MultiAddress"
+        repo:
+          type: string
+          description: Path of the data repository where all nodes data are stored
+        spr:
+          $ref: "#/components/schemas/SPR"
+        announceAddresses:
+          type: array
+          items:
+            $ref: "#/components/schemas/MultiAddress"
+        table:
+          $ref: "#/components/schemas/PeersTable"
+        storage:
+          $ref: "#/components/schemas/StorageVersion"
+
+    DataList:
+      type: object
+      required:
+        - content
+      properties:
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/DataItem"
+
+    DataItem:
+      type: object
+      required:
+        - cid
+        - manifest
+      properties:
+        cid:
+          $ref: "#/components/schemas/Cid"
+        manifest:
+          $ref: "#/components/schemas/ManifestItem"
+
+    ManifestItem:
+      type: object
+      required:
+        - treeCid
+        - datasetSize
+        - blockSize
+      properties:
+        treeCid:
+          $ref: "#/components/schemas/Cid"
+          description: "Unique data identifier"
+        datasetSize:
+          type: integer
+          format: int64
+          description: "Length of original content in bytes"
+        blockSize:
+          type: integer
+          description: "Size of blocks"
+        filename:
+          type: string
+          nullable: true
+          description: "The original name of the uploaded content (optional)"
+          example: storage.png
+        mimetype:
+          type: string
+          nullable: true
+          description: "The original mimetype of the uploaded content (optional)"
+          example: image/png
+
+    Space:
+      type: object
+      required:
+        - totalBlocks
+        - quotaMaxBytes
+        - quotaUsedBytes
+        - quotaReservedBytes
+      properties:
+        totalBlocks:
+          description: "Number of blocks stored by the node"
+          type: integer
+          format: int64
+        quotaMaxBytes:
+          type: integer
+          format: int64
+          description: "Maximum storage space (in bytes) available for the node in Logos Storage's local repository."
+        quotaUsedBytes:
+          type: integer
+          format: int64
+          description: "Amount of storage space (in bytes) currently used for storing files in Logos Storage's local repository."
+        quotaReservedBytes:
+          type: integer
+          format: int64
+          description: "Amount of storage reserved (in bytes) in the Logos Storage's local repository for future use when storage requests will be picked up and hosted by the node using node's availabilities. This does not include the storage currently in use."
+
+servers:
+  - url: "http://localhost:8080/api/storage/v1"
+
+tags:
+  - name: Data
+    description: Data operations
+  - name: Node
+    description: Node management
+  - name: Debug
+    description: Debugging configuration
+
+paths:
+  "/connect/{peerId}":
+    get:
+      summary: "Connect to a peer"
+      description: |
+        If `addrs` param is supplied, it will be used to dial the peer, otherwise the `peerId` is used
+        to invoke peer discovery, if it succeeds the returned addresses will be used to dial.
+      tags: [Node]
+      operationId: connectPeer
+      parameters:
+        - in: path
+          name: peerId
+          required: true
+          schema:
+            $ref: "#/components/schemas/PeerId"
+          description: Peer that should be dialed.
+        - in: query
+          name: addrs
+          schema:
+            type: array
+            nullable: true
+            items:
+              $ref: "#/components/schemas/MultiAddress"
+          description: |
+            If supplied, it will be used to dial the peer.
+            The address has to target the listening address of the peer,
+            which is /ip4/<listen-ip>/tcp/<listen-port>, where `listen-port` is
+            specified with the `--listen-port` CLI flag and `listen-ip` with the
+            `--listen-ip` CLI flag.
+
+      responses:
+        "200":
+          description: Successfully connected to peer
+        "400":
+          description: Peer either not found or was not possible to dial
+
+  "/data":
+    get:
+      summary: "Lists manifest CIDs stored locally in node."
+      tags: [Data]
+      operationId: listData
+      responses:
+        "200":
+          description: Retrieved list of content CIDs
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataList"
+
+        "400":
+          description: Invalid CID is specified
+        "404":
+          description: Content specified by the CID is not found
+        "422":
+          description: The content type is not a valid content type or the filename is not valid
+        "500":
+          description: Well it was bad-bad
+    post:
+      summary: "Upload a file in a streaming manner. Once finished, the file is stored in the node and can be retrieved by any node in the network using the returned CID."
+      tags: [Data]
+      operationId: upload
+      parameters:
+        - name: content-type
+          in: header
+          required: false
+          description: The content type of the file. Must be valid.
+          schema:
+            type: string
+            example: "image/png"
+        - name: content-disposition
+          in: header
+          required: false
+          description: The content disposition used to send the filename.
+          schema:
+            type: string
+            example: 'attachment; filename="storage.png"'
+      requestBody:
+        content:
+          application/octet-stream:
+            schema:
+              type: string
+              format: binary
+      responses:
+        "200":
+          description: CID of uploaded file
+          content:
+            text/plain:
+              schema:
+                type: string
+        "422":
+          description: The mimetype of the filename is invalid
+        "500":
+          description: Well it was bad-bad and the upload did not work out
+
+  "/data/{cid}":
+    get:
+      summary: "Download a file from the local node in a streaming manner. If the file is not available locally, a 404 is returned."
+      tags: [Data]
+      operationId: downloadLocal
+      parameters:
+        - in: path
+          name: cid
+          required: true
+          schema:
+            $ref: "#/components/schemas/Cid"
+          description: File to be downloaded.
+
+      responses:
+        "200":
+          description: Retrieved content specified by CID
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        "400":
+          description: Invalid CID is specified
+        "404":
+          description: Content specified by the CID is unavailable locally
+        "500":
+          description: Well it was bad-bad
+
+    delete:
+      summary: "Deletes either a single block or an entire dataset from the local node."
+      tags: [Data]
+      operationId: deleteLocal
+      parameters:
+        - in: path
+          name: cid
+          required: true
+          schema:
+            $ref: "#/components/schemas/Cid"
+          description: Block or dataset to be deleted.
+
+      responses:
+        "204":
+          description: Data was successfully deleted.
+        "400":
+          description: Invalid CID is specified
+        "500":
+          description: There was an error during deletion
+
+  "/data/{cid}/network":
+    post:
+      summary: "Download a file from the network to the local node if it's not available locally. Note: Download is performed async. Call can return before download is completed."
+      tags: [Data]
+      operationId: downloadNetwork
+      parameters:
+        - in: path
+          name: cid
+          required: true
+          schema:
+            $ref: "#/components/schemas/Cid"
+          description: "File to be downloaded."
+      responses:
+        "200":
+          description: Manifest information for download that has been started.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataItem"
+        "400":
+          description: Invalid CID is specified
+        "404":
+          description: Failed to download dataset manifest
+        "500":
+          description: Well it was bad-bad
+
+  "/data/{cid}/network/stream":
+    get:
+      summary: "Download a file from the network in a streaming manner. If the file is not available locally, it will be retrieved from other nodes in the network if able."
+      tags: [Data]
+      operationId: downloadNetworkStream
+      parameters:
+        - in: path
+          name: cid
+          required: true
+          schema:
+            $ref: "#/components/schemas/Cid"
+          description: "File to be downloaded."
+      responses:
+        "200":
+          description: Retrieved content specified by CID
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        "400":
+          description: Invalid CID is specified
+        "404":
+          description: Content specified by the CID is not found
+        "500":
+          description: Well it was bad-bad
+
+  "/data/{cid}/network/manifest":
+    get:
+      summary: "Download only the dataset manifest from the network to the local node if it's not available locally."
+      tags: [Data]
+      operationId: downloadNetworkManifest
+      parameters:
+        - in: path
+          name: cid
+          required: true
+          schema:
+            $ref: "#/components/schemas/Cid"
+          description: "File for which the manifest is to be downloaded."
+      responses:
+        "200":
+          description: Manifest information.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataItem"
+        "400":
+          description: Invalid CID is specified
+        "404":
+          description: Failed to download dataset manifest
+        "500":
+          description: Well it was bad-bad
+
+  "/data/{cid}/exists":
+    get:
+      summary: "Check if a block identified by CID exists in the local node."
+      tags: [Data]
+      operationId: hasBlock
+      parameters:
+        - in: path
+          name: cid
+          required: true
+          schema:
+            $ref: "#/components/schemas/Cid"
+          description: "CID of the block to check."
+      responses:
+        "200":
+          description: Block existence information
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  has:
+                    type: boolean
+                    description: Indicates whether the block exists in the local node
+        "400":
+          description: Invalid CID is specified
+        "500":
+          description: Well it was bad-bad
+
+  "/space":
+    get:
+      summary: "Gets a summary of the storage space allocation of the node."
+      tags: [Data]
+      operationId: space
+      responses:
+        "200":
+          description: "Summary of storage allocation"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Space"
+
+        "500":
+          description: "It's not working as planned"
+
+  "/spr":
+    get:
+      summary: "Get Node's SPR"
+      operationId: getSPR
+      tags: [Node]
+      responses:
+        "200":
+          description: Node's SPR
+          content:
+            text/plain:
+              schema:
+                $ref: "#/components/schemas/SPR"
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SPRRead"
+        "503":
+          description: Node SPR not ready, try again later
+
+  "/peerid":
+    get:
+      summary: "Get Node's PeerID"
+      operationId: getPeerId
+      tags: [Node]
+      responses:
+        "200":
+          description: Node's Peer ID
+          content:
+            text/plain:
+              schema:
+                $ref: "#/components/schemas/PeerId"
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PeerIdRead"
+
+  "/debug/chronicles/loglevel":
+    post:
+      summary: "Set log level at run time"
+      tags: [Debug]
+      operationId: setDebugLogLevel
+
+      parameters:
+        - in: query
+          name: level
+          required: true
+          schema:
+            $ref: "#/components/schemas/LogLevel"
+
+      responses:
+        "200":
+          description: Successfully log level set
+        "400":
+          description: Invalid or missing log level
+        "500":
+          description: Well it was bad-bad
+
+  "/debug/info":
+    get:
+      summary: "Gets node information"
+      operationId: getDebugInfo
+      tags: [Debug]
+      responses:
+        "200":
+          description: Node's information
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DebugInfo"

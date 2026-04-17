@@ -1,0 +1,12 @@
+dotnet run \
+    --project "${TESTS_PATH:-Tests/LogosStorageContinuousTests}" \
+    --kube-config="${KUBECONFIG:-/opt/kubeconfig.yaml}" \
+    --storage-deployment="${TESTS_CODEX_DEPLOYMENT:-storage-deployment.json}" \
+    --filter="${TESTS_FILTER:-}" \
+    --data-path="${TESTS_DATA_PATH:-data}" \
+    --log-path="${LOGPATH:-/var/log/storage-continuous-tests}" \
+    --full-container-logs=1 \
+    --keep=${TESTS_KEEP:-1} \
+    --stop=${TESTS_STOP:-10} \
+    --target-duration=${TESTS_TARGET_DURATION:-172800} \
+    --cleanup="${TESTS_CLEANUP:-false}"

@@ -1,16 +1,16 @@
-﻿using CodexClient;
-using CodexPlugin.OverwatchSupport;
+﻿using LogosStorageClient;
+using StoragePlugin.OverwatchSupport;
 using OverwatchTranscript;
 
 namespace TranscriptAnalysis.Receivers
 {
-    public class LogReplaceReceiver : BaseReceiver<OverwatchCodexEvent>
+    public class LogReplaceReceiver : BaseReceiver<OverwatchLogosStorageEvent>
     {
         public override string Name => "LogReplacer";
 
         private readonly List<string> seen = new List<string>();
 
-        public override void Receive(ActivateEvent<OverwatchCodexEvent> @event)
+        public override void Receive(ActivateEvent<OverwatchLogosStorageEvent> @event)
         {
             var peerId = GetPeerId(@event.Payload.NodeIdentity);
             var name = GetName(@event.Payload.NodeIdentity);
@@ -22,7 +22,7 @@ namespace TranscriptAnalysis.Receivers
                 seen.Add(peerId);
 
                 log.AddStringReplace(peerId, name);
-                log.AddStringReplace(CodexUtils.ToShortId(peerId), name);
+                log.AddStringReplace(LogosStorageUtils.ToShortId(peerId), name);
             }
         }
 

@@ -1,12 +1,12 @@
-﻿using CodexClient;
-using CodexTests;
+﻿using LogosStorageClient;
+using LogosStorageTests;
 using NUnit.Framework;
 using Utils;
 
 namespace ExperimentalTests.BasicTests
 {
     [TestFixture]
-    public class PyramidTests : CodexDistTest
+    public class PyramidTests : LogosStorageDistTest
     {
         [Test]
         [CreateTranscript(nameof(PyramidTest))]
@@ -22,17 +22,17 @@ namespace ExperimentalTests.BasicTests
             DownloadAllFilesFromEachNodeInLayer(bottomLayer, cids);
         }
 
-        private List<ICodexNode> StartLayers(int numberOfLayers)
+        private List<IStorageNode> StartLayers(int numberOfLayers)
         {
-            var layer = new List<ICodexNode>();
-            layer.Add(StartCodex(s => s.WithName("Top")));
+            var layer = new List<IStorageNode>();
+            layer.Add(StartLogosStorage(s => s.WithName("Top")));
 
             for (var i = 0; i < numberOfLayers; i++)
             {
-                var newLayer = new List<ICodexNode>();
+                var newLayer = new List<IStorageNode>();
                 foreach (var node in layer)
                 {
-                    newLayer.AddRange(StartCodex(2, s => s.WithBootstrapNode(node).WithName("Layer[" + i + "]")));
+                    newLayer.AddRange(StartLogosStorage(2, s => s.WithBootstrapNode(node).WithName("Layer[" + i + "]")));
                 }
 
                 layer.Clear();
@@ -42,7 +42,7 @@ namespace ExperimentalTests.BasicTests
             return layer;
         }
 
-        private ContentId[] UploadFiles(List<ICodexNode> layer, ByteSize size)
+        private ContentId[] UploadFiles(List<IStorageNode> layer, ByteSize size)
         {
             var uploadTasks = new List<Task<ContentId>>();
             foreach (var node in layer)
@@ -63,7 +63,7 @@ namespace ExperimentalTests.BasicTests
             return cids;
         }
 
-        private void DownloadAllFilesFromEachNodeInLayer(List<ICodexNode> layer, ContentId[] cids)
+        private void DownloadAllFilesFromEachNodeInLayer(List<IStorageNode> layer, ContentId[] cids)
         {
             var downloadTasks = new List<Task>();
             foreach (var node in layer)

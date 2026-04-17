@@ -1,5 +1,5 @@
-﻿using CodexClient;
-using CodexTests;
+﻿using LogosStorageClient;
+using LogosStorageTests;
 using NUnit.Framework;
 using Utils;
 
@@ -12,8 +12,8 @@ namespace ExperimentalTests.UtilityTests
         [Ignore("Used to find the most common log messages.")]
         public void FindMostCommonLogMessages()
         {
-            var uploader = StartCodex(s => s.WithName("uploader").WithLogLevel(CodexLogLevel.Trace));
-            var downloader = StartCodex(s => s.WithName("downloader").WithLogLevel(CodexLogLevel.Trace));
+            var uploader = StartLogosStorage(s => s.WithName("uploader").WithLogLevel(LogosStorageLogLevel.Trace));
+            var downloader = StartLogosStorage(s => s.WithName("downloader").WithLogLevel(LogosStorageLogLevel.Trace));
 
             var cid = uploader.UploadFile(GenerateTestFile(100.MB()));
 
@@ -34,13 +34,13 @@ namespace ExperimentalTests.UtilityTests
             }
         }
 
-        private Dictionary<string, int> GetLogMap(ICodexNode node, DateTime? startUtc = null)
+        private Dictionary<string, int> GetLogMap(IStorageNode node, DateTime? startUtc = null)
         {
             var log = node.DownloadLog();
             var map = new Dictionary<string, int>();
             log.IterateLines(line =>
             {
-                var log = CodexLogLine.Parse(line);
+                var log = LogosStorageLogLine.Parse(line);
                 if (log == null) return;
 
                 if (startUtc.HasValue)

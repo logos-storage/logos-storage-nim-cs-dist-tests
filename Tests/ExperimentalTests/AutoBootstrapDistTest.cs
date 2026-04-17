@@ -1,20 +1,20 @@
-﻿using CodexClient;
-using CodexPlugin;
+﻿using LogosStorageClient;
+using StoragePlugin;
 using NUnit.Framework;
 
-namespace CodexTests
+namespace LogosStorageTests
 {
-    public class AutoBootstrapDistTest : CodexDistTest
+    public class AutoBootstrapDistTest : LogosStorageDistTest
     {
         private bool isBooting = false;
 
-        public ICodexNode BootstrapNode { get; private set; } = null!;
+        public IStorageNode BootstrapNode { get; private set; } = null!;
 
         [SetUp]
         public void SetupBootstrapNode()
         {
             isBooting = true;
-            BootstrapNode = StartCodex(s => s.WithName("BOOTSTRAP_" + GetTestNamespace()));
+            BootstrapNode = StartLogosStorage(s => s.WithName("BOOTSTRAP_" + GetTestNamespace()));
             isBooting = false;
         }
 
@@ -24,7 +24,7 @@ namespace CodexTests
             BootstrapNode.Stop(waitTillStopped: false);
         }
 
-        protected override void OnCodexSetup(ICodexSetup setup)
+        protected override void OnLogosStorageSetup(ILogosStorageSetup setup)
         {
             if (isBooting) return;
 

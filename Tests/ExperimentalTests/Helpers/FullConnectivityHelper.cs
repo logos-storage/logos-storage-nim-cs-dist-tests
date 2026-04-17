@@ -1,9 +1,9 @@
-﻿using CodexClient;
-using CodexPlugin;
+﻿using LogosStorageClient;
+using StoragePlugin;
 using Logging;
 using NUnit.Framework;
 
-namespace CodexTests.Helpers
+namespace LogosStorageTests.Helpers
 {
     public interface IFullConnectivityImplementation
     {
@@ -24,12 +24,12 @@ namespace CodexTests.Helpers
             this.implementation = implementation;
         }
 
-        public void AssertFullyConnected(IEnumerable<ICodexNode> nodes)
+        public void AssertFullyConnected(IEnumerable<IStorageNode> nodes)
         {
             AssertFullyConnected(nodes.ToArray());
         }
 
-        private void AssertFullyConnected(ICodexNode[] nodes)
+        private void AssertFullyConnected(IStorageNode[] nodes)
         {
             Log($"Asserting '{implementation.Description()}' for nodes: '{nodes.Names()}'...");
             Assert.That(nodes.Length, Is.GreaterThan(1));
@@ -70,7 +70,7 @@ namespace CodexTests.Helpers
             Log($"Connections successful:{Nl}{string.Join(Nl, results)}");
         }
 
-        private Entry[] CreateEntries(ICodexNode[] nodes)
+        private Entry[] CreateEntries(IStorageNode[] nodes)
         {
             var entries = nodes.Select(n => new Entry(n)).ToArray();
 
@@ -110,13 +110,13 @@ namespace CodexTests.Helpers
 
         public class Entry
         {
-            public Entry(ICodexNode node)
+            public Entry(IStorageNode node)
             {
                 Node = node;
                 Response = node.GetDebugInfo();
             }
 
-            public ICodexNode Node { get; }
+            public IStorageNode Node { get; }
             public DebugInfo Response { get; }
 
             public override string ToString()

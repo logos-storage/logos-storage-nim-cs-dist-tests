@@ -1,4 +1,4 @@
-﻿using CodexPlugin.OverwatchSupport;
+﻿using StoragePlugin.OverwatchSupport;
 using Logging;
 using OverwatchTranscript;
 using TranscriptAnalysis.Receivers;
@@ -7,7 +7,7 @@ namespace TranscriptAnalysis
 {
     public interface IEventReceiver
     {
-        void Init(string sourceFilename, ILog log, OverwatchCodexHeader header);
+        void Init(string sourceFilename, ILog log, OverwatchLogosStorageHeader header);
         void Finish();
     }
 
@@ -21,10 +21,10 @@ namespace TranscriptAnalysis
         private readonly string sourceFilename;
         private readonly ILog log;
         private readonly ITranscriptReader reader;
-        private readonly OverwatchCodexHeader header;
+        private readonly OverwatchLogosStorageHeader header;
         private readonly List<IEventReceiver> receivers = new List<IEventReceiver>();
 
-        public ReceiverSet(string sourceFilename, ILog log, ITranscriptReader reader, OverwatchCodexHeader header)
+        public ReceiverSet(string sourceFilename, ILog log, ITranscriptReader reader, OverwatchLogosStorageHeader header)
         {
             this.sourceFilename = sourceFilename;
             this.log = log;
