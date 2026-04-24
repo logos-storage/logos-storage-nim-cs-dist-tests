@@ -1,6 +1,6 @@
 # Running Release Tests
 
-This guide covers running the release tests both **locally** (against a local Kubernetes cluster) and **on Digital Ocean** (or any remote Kubernetes cluster).
+This guide covers running the release tests both **locally** (against a local Kubernetes cluster) and **on Google Kubernetes Engine** (or any remote Kubernetes cluster).
 
 ---
 
@@ -107,33 +107,36 @@ docker pull logosstorage/logos-storage-nim:latest-dist-tests
 
 ---
 
-## 2. Running on Digital Ocean (Remote Kubernetes)
+## 2. Running on Google Kubernetes Engine (Remote Kubernetes)
 
 ### Overview
 
 On a remote cluster the test runner itself must run **inside** the cluster, because the framework needs direct pod-to-pod networking. The CI workflow does this automatically by creating a Kubernetes Job that runs the test runner image. You can also do it manually.
 
+Pod logs from all containers (test runner and storage nodes) are automatically shipped to Google Cloud Logging — no additional log agent is required.
+
 ### Prerequisites
 
-- A running Digital Ocean Kubernetes (DOKS) cluster
-- `kubectl` configured to talk to that cluster
+- A running GKE cluster (provisioned via Terraform — see `.github/release/clusters/logos-storage-dist-tests-gcp-europe-west4/`)
+- [`gcloud` CLI](https://cloud.google.com/sdk/docs/install) installed and authenticated
+- `kubectl` installed
 - The cluster must be pre-configured (see below)
 
 ### 2a. Cluster pre-configuration
 
-Do these steps once per cluster.
+Do these steps once per cluster. When the cluster is provisioned via CI (see §2b), the workflow handles steps 1 and 2 automatically.
 
-**1. Label the worker nodes that will run the test runner pod**
+**1. Authenticate kubectl against the cluster**
 
 ```bash
-kubectl label node <node-name> workload-type=tests-runners-ci
+gcloud container clusters get-credentials logos-storage-dist-tests-gcp-europe-west4 \
+  --region europe-west4 \
+  --project <your-gcp-project-id>
 ```
-
-The job manifest uses a `nodeSelector` for this label, so at least one node must have it.
 
 **2. Create the kubeconfig secret for the test runner**
 
-The test runner pod itself needs a kubeconfig to manage pods inside the cluster. Use a static service-account-based kubeconfig — avoid copying your local `~/.kube/config` directly, as it likely uses an exec credential plugin (e.g. `doctl`) that won't be available inside the pod.
+The test runner pod itself needs a kubeconfig to manage pods inside the cluster. Use a static service-account-based kubeconfig — avoid copying your local `~/.kube/config` directly, as it uses `gcloud` exec credentials that won't be available inside the pod.
 
 ```bash
 # Create a service account and grant it cluster-admin access
@@ -180,46 +183,56 @@ If missing, create it or change the priority class name in [docker/job-release-t
 
 ### 2b. Running via GitHub Actions (recommended)
 
-This is the standard automated path.
+This is the standard automated path. The CI workflow provisions a fresh GKE cluster, runs the tests, then tears the cluster down — all in one job.
 
-**Required GitHub secret:**
+**Required GitHub secrets:**
 
-| Secret | Value |
+| Secret | Description |
 |---|---|
-| `KUBE_CONFIG` | Base64-encoded kubeconfig with permissions to create Jobs/Pods in the cluster |
+| `RELEASE_TESTS_GCP_WORKLOAD_IDENTITY_PROVIDER` | Workload Identity Federation provider resource name |
+| `RELEASE_TESTS_GCP_SERVICE_ACCOUNT` | Service account email used by the workflow |
+| `RELEASE_TESTS_TF_STATE_BUCKET` | GCS bucket name for Terraform state |
 
-Encode your kubeconfig:
-```bash
-base64 -i ~/.kube/do-cluster-config | pbcopy   # macOS
-base64 -w0 ~/.kube/do-cluster-config           # Linux
-```
+**Required GitHub variables** (Settings → Secrets and variables → Actions → **Variables** tab):
+
+| Variable | Description |
+|---|---|
+| `RELEASE_TESTS_GCP_PROJECT` | GCP project ID — stored as a variable (not a secret) so it appears unmasked in logs and in the Cloud Logging link printed during the run |
+
+**Required GCP setup (one-time):**
+
+1. Enable APIs: `container.googleapis.com`, `cloudresourcemanager.googleapis.com`
+2. Create a Workload Identity Federation pool + GitHub OIDC provider bound to the `logos-storage/logos-storage-nim` repository
+3. Grant the service account: `roles/container.admin` (project-level) and `roles/storage.objectAdmin` (scoped to the state bucket)
 
 **Trigger the workflow:**
 
-Go to **Actions → Run Release Tests → Run workflow** and provide:
-
-| Input | Description |
-|---|---|
-| `storagedockerimage` | Image to test, e.g. `logosstorage/logos-storage-nim:v0.1.8-dist-tests` |
-
-Optional inputs (for non-default branches/repos):
-
-| Input | Description |
-|---|---|
-| `source` | Repository URL (defaults to current repo) |
-| `branch` | Branch to clone for running tests (defaults to current branch) |
+The release tests run automatically on every version tag push (`v*.*.*`). To trigger manually, go to **Actions → Release → Run workflow**.
 
 **What happens:**
 
-1. GitHub Actions decodes `KUBE_CONFIG` and runs `kubectl`
-2. Creates a Kubernetes Job from [docker/job-release-tests.yaml](../docker/job-release-tests.yaml) with substituted variables
-3. The Job runs the `logosstorage/logos-storage-dist-tests:latest` image
-4. The entrypoint clones this repo, runs `dotnet test Tests/LogosStorageReleaseTests`
-5. The workflow streams pod logs and fails if the Job does not complete successfully
+1. GitHub Actions authenticates to GCP via Workload Identity Federation (no long-lived credentials)
+2. `terraform apply` provisions the GKE cluster
+3. `gcloud container clusters get-credentials` configures kubectl
+4. A service account + in-cluster kubeconfig secret are created
+5. A Kubernetes Job is deployed from `.github/release/job-release-tests.yaml`
+6. The Job runs `logosstorage/logos-storage-dist-tests:latest`, which clones this repo and runs `dotnet test Tests/LogosStorageReleaseTests`
+7. The workflow streams pod logs and fails if the Job does not complete successfully
+8. `terraform destroy` tears the cluster down (runs even on failure)
+
+Pod logs are also available in Google Cloud Logging under `resource.type="k8s_container"` for the project and cluster.
 
 ### 2c. Running manually with kubectl
 
-Useful for debugging or one-off runs without CI.
+Useful for debugging or one-off runs against an already-provisioned cluster.
+
+**Authenticate kubectl first (if not already done):**
+
+```bash
+gcloud container clusters get-credentials logos-storage-dist-tests-gcp-europe-west4 \
+  --region europe-west4 \
+  --project <your-gcp-project-id>
+```
 
 **Set the required variables:**
 
@@ -256,6 +269,16 @@ kubectl get job $NAMEPREFIX -o jsonpath='{.status.conditions[0].type}'
 # Should print "Complete"
 ```
 
+Logs are also available in Cloud Logging. To query from the CLI:
+
+```bash
+gcloud logging read \
+  'resource.type="k8s_container" AND resource.labels.cluster_name="logos-storage-dist-tests-gcp-europe-west4"' \
+  --project=<your-gcp-project-id> \
+  --format=json \
+  --limit=100
+```
+
 **Cleanup:**
 
 Jobs are auto-deleted after 24 hours (TTL configured in the manifest). To delete immediately:
@@ -266,7 +289,7 @@ kubectl delete job $NAMEPREFIX
 
 ### Key differences: local vs. remote
 
-| | Local (Docker Desktop) | Remote (Digital Ocean) |
+| | Local (Docker Desktop) | Remote (GKE) |
 |---|---|---|
 | Runner location | Your machine (external to cluster) | Inside a pod in the cluster |
 | Kubeconfig | `~/.kube/config` (auto) | Mounted secret `storage-dist-tests-app-kubeconfig` |
@@ -274,3 +297,4 @@ kubectl delete job $NAMEPREFIX
 | `RUNNERLOCATION` detection | `ExternalToCluster` (automatic) | `InternalToCluster` (automatic inside pod) |
 | How to run | `dotnet test` on your machine | Kubernetes Job |
 | Image required | No (builds from source) | `logosstorage/logos-storage-dist-tests:latest` |
+| Log access | Local files / console output | `kubectl logs` + Google Cloud Logging |
