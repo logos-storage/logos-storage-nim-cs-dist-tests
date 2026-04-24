@@ -7,7 +7,7 @@ namespace DistTestCore
 {
     public class Global
     {
-        public const string TestNamespacePrefix = "cdx-";
+        public const string TestNamespacePrefix = "storage-";
         public Configuration Configuration { get; } = new Configuration();
 
         public Assembly[] TestAssemblies { get; }
