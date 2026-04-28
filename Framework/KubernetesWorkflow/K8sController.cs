@@ -740,7 +740,16 @@ namespace KubernetesWorkflow
             }
             var pod = pods[0];
             if (pod.Status == null) throw new Exception("Pod status unknown");
-            if (string.IsNullOrEmpty(pod.Status.PodIP)) throw new Exception("Pod IP unknown");
+            if (string.IsNullOrEmpty(pod.Status.PodIP))
+            {
+                // Pod exists but has no IP yet (still being scheduled/networked).
+                // Sleep briefly so this failure takes >1s, preventing the failFast
+                // short-circuit in Retry.CheckMaximums from firing after 6 tries.
+                // The caller retries for up to 15 minutes, which is needed when the
+                // spot node pool is scaling up to accommodate new pods.
+                Time.Sleep(TimeSpan.FromSeconds(2));
+                throw new Exception("Pod IP unknown");
+            }
             return pod;
         }
 
