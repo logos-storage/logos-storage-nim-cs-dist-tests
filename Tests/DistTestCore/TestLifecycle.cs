@@ -99,6 +99,8 @@ namespace DistTestCore
         {
             recipe.PodLabels.Add("tests-type", TestsType);
             recipe.PodLabels.Add("deployid", deployId);
+            var runId = Environment.GetEnvironmentVariable("RUNID");
+            if (!string.IsNullOrEmpty(runId)) recipe.PodLabels.Add("runid", runId);
             recipe.PodLabels.Add("testid", NameUtils.GetTestId());
             recipe.PodLabels.Add("category", NameUtils.GetCategoryName());
             recipe.PodLabels.Add("fixturename", NameUtils.GetRawFixtureName());
