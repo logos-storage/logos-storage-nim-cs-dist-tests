@@ -30,7 +30,6 @@ namespace StoragePlugin
             //SetResourceLimits(milliCPUs: 4000, memory: 12.GB());
 
             SetSchedulingAffinity(notIn: "false");
-            SetSystemCriticalPriority();
 
             var config = startupConfig.Get<LogosStorageStartupConfig>();
 
