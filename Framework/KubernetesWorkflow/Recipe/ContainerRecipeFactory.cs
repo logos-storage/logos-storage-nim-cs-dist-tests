@@ -14,7 +14,8 @@ namespace KubernetesWorkflow.Recipe
         private readonly List<object> additionals = new List<object>();
         private RecipeComponentFactory factory = null!;
         private ContainerResources resources = new ContainerResources();
-        private SchedulingAffinity schedulingAffinity = new SchedulingAffinity();
+        private readonly Dictionary<string, string> nodePoolLabels = new Dictionary<string, string>();
+        private readonly List<PodToleration> tolerations = new List<PodToleration>();
         private CommandOverride commandOverride = new CommandOverride();
         private bool setCriticalPriority;
 
@@ -26,7 +27,10 @@ namespace KubernetesWorkflow.Recipe
 
             Initialize(config);
 
-            var recipe = new ContainerRecipe(DateTime.UtcNow, containerNumber, config.NameOverride, Image, resources, schedulingAffinity, commandOverride, setCriticalPriority,
+            var recipe = new ContainerRecipe(DateTime.UtcNow, containerNumber, config.NameOverride, Image, resources,
+                new Dictionary<string, string>(nodePoolLabels),
+                tolerations.ToArray(),
+                commandOverride, setCriticalPriority,
                 exposedPorts.ToArray(),
                 internalPorts.ToArray(),
                 envVars.ToArray(),
@@ -35,18 +39,7 @@ namespace KubernetesWorkflow.Recipe
                 volumeMounts.ToArray(),
                 ContainerAdditionals.CreateFromUserData(additionals));
 
-            exposedPorts.Clear();
-            internalPorts.Clear();
-            envVars.Clear();
-            podLabels.Clear();
-            podAnnotations.Clear();
-            volumeMounts.Clear();
-            additionals.Clear();
-            this.factory = null!;
-            resources = new ContainerResources();
-            schedulingAffinity = new SchedulingAffinity();
-            commandOverride = new CommandOverride();
-            setCriticalPriority = false;
+            Reset();
 
             return recipe;
         }
@@ -133,9 +126,14 @@ namespace KubernetesWorkflow.Recipe
             SetResourcesRequest(new ContainerResourceSet(milliCPUs, memory));
         }
 
-        protected void SetSchedulingAffinity(string notIn)
+        protected void ScheduleInPoolsWithLabel(string key, string value)
         {
-            schedulingAffinity = new SchedulingAffinity(notIn);
+            nodePoolLabels[key] = value;
+        }
+
+        protected void AddToleration(string key, string value, string effect)
+        {
+            tolerations.Add(new PodToleration(key, value, effect));
         }
 
         protected void OverrideCommand(params string[] command)
@@ -163,6 +161,23 @@ namespace KubernetesWorkflow.Recipe
         protected void SetResourceLimits(ContainerResourceSet limits)
         {
             resources.Limits = limits;
+        }
+
+        private void Reset()
+        {
+            exposedPorts.Clear();
+            internalPorts.Clear();
+            envVars.Clear();
+            podLabels.Clear();
+            podAnnotations.Clear();
+            volumeMounts.Clear();
+            additionals.Clear();
+            nodePoolLabels.Clear();
+            tolerations.Clear();
+            factory = null!;
+            resources = new ContainerResources();
+            commandOverride = new CommandOverride();
+            setCriticalPriority = false;
         }
 
         private Port AddExposedPort(Port port)

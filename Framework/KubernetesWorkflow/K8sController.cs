@@ -371,8 +371,8 @@ namespace KubernetesWorkflow
                         Spec = new V1PodSpec
                         {
                             PriorityClassName = GetPriorityClassName(containerRecipes),
-                            Affinity = CreatePodAffinity(containerRecipes),
-                            NodeSelector = CreateNodeSelector(location),
+                            NodeSelector = CreateNodeSelector(location, containerRecipes),
+                            Tolerations = CreateTolerations(containerRecipes),
                             Containers = CreateDeploymentContainers(containerRecipes),
                             Volumes = CreateVolumes(containerRecipes)
                         }
@@ -392,51 +392,32 @@ namespace KubernetesWorkflow
             WaitUntilDeploymentOffline(deployment.Name);
         }
 
-        private IDictionary<string, string> CreateNodeSelector(ILocation location)
+        private IDictionary<string, string> CreateNodeSelector(ILocation location, ContainerRecipe[] recipes)
         {
-            var nodeLabel = GetNodeLabelForLocation(location);
-            if (nodeLabel == null) return new Dictionary<string, string>();
+            var result = new Dictionary<string, string>();
 
-            return new Dictionary<string, string>
-            {
-                { nodeLabel.Key, nodeLabel.Value }
-            };
+            var nodeLabel = GetNodeLabelForLocation(location);
+            if (nodeLabel != null) result[nodeLabel.Key] = nodeLabel.Value;
+
+            foreach (var recipe in recipes)
+                foreach (var kvp in recipe.NodePoolLabels)
+                    result[kvp.Key] = kvp.Value;
+
+            return result;
         }
 
-        private V1Affinity? CreatePodAffinity(ContainerRecipe[] recipes)
+        private IList<V1Toleration>? CreateTolerations(ContainerRecipe[] recipes)
         {
-            var notIns = recipes
-                .Select(r => r.SchedulingAffinity.NotIn)
-                .Where(n => !string.IsNullOrEmpty(n))
-                .Distinct()
-                .ToList();
+            var distinct = recipes.SelectMany(r => r.Tolerations).Distinct().ToList();
+            if (!distinct.Any()) return null;
 
-            if (!notIns.Any()) return null;
-
-            return new V1Affinity
+            return distinct.Select(t => new V1Toleration
             {
-                NodeAffinity = new V1NodeAffinity
-                {
-                    RequiredDuringSchedulingIgnoredDuringExecution = new V1NodeSelector
-                    {
-                        NodeSelectorTerms = new List<V1NodeSelectorTerm>
-                        { 
-                            new V1NodeSelectorTerm
-                            {
-                                MatchExpressions = new List<V1NodeSelectorRequirement>
-                                {
-                                    new V1NodeSelectorRequirement
-                                    {
-                                        Key = "allow-tests-pods",
-                                        OperatorProperty = "NotIn",
-                                        Values = notIns
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            };
+                Key = t.Key,
+                OperatorProperty = "Equal",
+                Value = t.Value,
+                Effect = t.Effect
+            }).ToList();
         }
 
         private K8sNodeLabel? GetNodeLabelForLocation(ILocation location)
@@ -445,13 +426,10 @@ namespace KubernetesWorkflow
             return l.NodeLabel;
         }
 
-        private string GetPriorityClassName(ContainerRecipe[] containerRecipes)
+        private string? GetPriorityClassName(ContainerRecipe[] containerRecipes)
         {
-            if (containerRecipes.Any(c => c.SetCriticalPriority))
-            {
-                return "system-node-critical";
-            }
-            return null!;
+            if (containerRecipes.Any(c => c.IsCriticalPriority)) return "system-node-critical";
+            return null;
         }
 
         private IDictionary<string, string> GetSelector(ContainerRecipe[] containerRecipes)
@@ -759,7 +737,7 @@ namespace KubernetesWorkflow
 
         private RunningService? CreateInternalService(ContainerRecipe[] recipes)
         {
-            return CreateService(recipes, r => r.InternalPorts.Concat(r.ExposedPorts).ToArray(), "ClusterIP", "int", false);
+            return CreateService(recipes, r => r.InternalPorts.Concat(r.ExposedPorts), "ClusterIP", "int", false);
         }
 
         private RunningService? CreateExternalService(ContainerRecipe[] recipes)
@@ -767,7 +745,7 @@ namespace KubernetesWorkflow
             return CreateService(recipes, r => r.ExposedPorts, "NodePort", "ext", true);
         }
 
-        private RunningService? CreateService(ContainerRecipe[] recipes, Func<ContainerRecipe, Port[]> portSelector, string serviceType, string namePostfix, bool isNodePort)
+        private RunningService? CreateService(ContainerRecipe[] recipes, Func<ContainerRecipe, IEnumerable<Port>> portSelector, string serviceType, string namePostfix, bool isNodePort)
         {
             var ports = CreateServicePorts(recipes, portSelector, isNodePort);
             if (!ports.Any()) return null;
@@ -843,7 +821,7 @@ namespace KubernetesWorkflow
             };
         }
 
-        private List<V1ServicePort> CreateServicePorts(ContainerRecipe[] recipes, Func<ContainerRecipe, Port[]> portSelector, bool isNodePort)
+        private List<V1ServicePort> CreateServicePorts(ContainerRecipe[] recipes, Func<ContainerRecipe, IEnumerable<Port>> portSelector, bool isNodePort)
         {
             var result = new List<V1ServicePort>();
             foreach (var recipe in recipes)
