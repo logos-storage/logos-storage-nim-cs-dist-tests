@@ -2,16 +2,17 @@
 {
     public class ContainerRecipe
     {
-        public ContainerRecipe(DateTime recipeCreatedUtc, int number, string? nameOverride, string image, ContainerResources resources, SchedulingAffinity schedulingAffinity, CommandOverride commandOverride, bool setCriticalPriority, Port[] exposedPorts, Port[] internalPorts, EnvVar[] envVars, PodLabels podLabels, PodAnnotations podAnnotations, VolumeMount[] volumes, ContainerAdditionals additionals)
+        public ContainerRecipe(DateTime recipeCreatedUtc, int number, string? nameOverride, string image, ContainerResources resources, IReadOnlyDictionary<string, string> nodePoolLabels, IReadOnlyList<PodToleration> tolerations, CommandOverride commandOverride, bool isCriticalPriority, IReadOnlyList<Port> exposedPorts, IReadOnlyList<Port> internalPorts, IReadOnlyList<EnvVar> envVars, PodLabels podLabels, PodAnnotations podAnnotations, IReadOnlyList<VolumeMount> volumes, ContainerAdditionals additionals)
         {
             RecipeCreatedUtc = recipeCreatedUtc;
             Number = number;
             NameOverride = nameOverride;
             Image = image;
             Resources = resources;
-            SchedulingAffinity = schedulingAffinity;
+            NodePoolLabels = nodePoolLabels;
+            Tolerations = tolerations;
             CommandOverride = commandOverride;
-            SetCriticalPriority = setCriticalPriority;
+            IsCriticalPriority = isCriticalPriority;
             ExposedPorts = exposedPorts;
             InternalPorts = internalPorts;
             EnvVars = envVars;
@@ -37,16 +38,17 @@
         public int Number { get; }
         public string? NameOverride { get; }
         public ContainerResources Resources { get; }
-        public SchedulingAffinity SchedulingAffinity { get; }
+        public IReadOnlyDictionary<string, string> NodePoolLabels { get; }
+        public IReadOnlyList<PodToleration> Tolerations { get; }
         public CommandOverride CommandOverride { get; }
-        public bool SetCriticalPriority { get; }
+        public bool IsCriticalPriority { get; }
         public string Image { get; }
-        public Port[] ExposedPorts { get; }
-        public Port[] InternalPorts { get; }
-        public EnvVar[] EnvVars { get; }
+        public IReadOnlyList<Port> ExposedPorts { get; }
+        public IReadOnlyList<Port> InternalPorts { get; }
+        public IReadOnlyList<EnvVar> EnvVars { get; }
         public PodLabels PodLabels { get; }
         public PodAnnotations PodAnnotations { get; }
-        public VolumeMount[] Volumes { get; }
+        public IReadOnlyList<VolumeMount> Volumes { get; }
         public ContainerAdditionals Additionals { get; }
 
         public Port? GetPortByTag(string tag)
@@ -61,7 +63,8 @@
                 $"internalPorts: {string.Join(",", InternalPorts.Select(p => p.Number))}, " +
                 $"envVars: {string.Join(",", EnvVars.Select(v => v.ToString()))}, " +
                 $"limits: {Resources}, " +
-                $"affinity: {SchedulingAffinity}, " +
+                $"nodePoolLabels: [{string.Join(",", NodePoolLabels.Select(kvp => $"{kvp.Key}={kvp.Value}"))}], " +
+                $"tolerations: [{string.Join(",", Tolerations.Select(t => $"{t.Key}={t.Value}:{t.Effect}"))}], " +
                 $"volumes: {string.Join(",", Volumes.Select(v => $"'{v.MountPath}'"))}";
         }
     }
@@ -106,6 +109,8 @@
         TCP,
         UDP
     }
+
+    public record PodToleration(string Key, string Value, string Effect);
 
     public class EnvVar
     {

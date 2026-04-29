@@ -14,7 +14,8 @@ namespace MetricsPlugin
         {
             var config = startupConfig.Get<PrometheusStartupConfig>();
 
-            SetSchedulingAffinity(notIn: "false");
+            ScheduleInPoolsWithLabel("workload-type", "tests-pods");
+            AddToleration("cloud.google.com/gke-provisioning", "spot", "NoSchedule");
 
             AddExposedPortAndVar("PROM_PORT", PortTag);
             AddEnvVar("PROM_CONFIG", config.PrometheusConfigBase64);
