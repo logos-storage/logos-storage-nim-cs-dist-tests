@@ -209,7 +209,7 @@ namespace DistTestCore
 
         private bool ShouldWaitForCleanup()
         {
-            return CurrentTestMethodHasAttribute<WaitForCleanupAttribute>();
+            return IsRunningInCluster() || CurrentTestMethodHasAttribute<WaitForCleanupAttribute>();
         }
 
         private bool ShouldUseLongTimeouts()
