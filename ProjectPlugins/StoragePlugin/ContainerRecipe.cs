@@ -29,9 +29,8 @@ namespace StoragePlugin
             SetResourcesRequest(milliCPUs: 100, memory: 100.MB());
             //SetResourceLimits(milliCPUs: 4000, memory: 12.GB());
 
-            // Schedule storage nodes on the spot node pool, away from the test runner.
+            // Schedule storage nodes on the tests node pool, away from the test runner.
             ScheduleInPoolsWithLabel("workload-type", "tests-pods");
-            AddToleration("cloud.google.com/gke-spot", "true", "NoSchedule");
 
             var config = startupConfig.Get<LogosStorageStartupConfig>();
 
