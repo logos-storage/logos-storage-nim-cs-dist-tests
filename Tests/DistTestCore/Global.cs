@@ -32,6 +32,12 @@ namespace DistTestCore
 
         public void Setup()
         {
+            // Console.Out is block-buffered when stdout is non-interactive (e.g. in a container).
+            // Replace it with an auto-flushing wrapper so the NUnit runner's own "Passed/Failed"
+            // progress lines are written to pod stdout immediately after each test completes,
+            // rather than batching until process exit.
+            Console.SetOut(new StreamWriter(Console.OpenStandardOutput()) { AutoFlush = true });
+
             try
             {
                 Trace.Listeners.Add(new ConsoleTraceListener());
