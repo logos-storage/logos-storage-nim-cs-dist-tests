@@ -74,6 +74,36 @@ namespace DistTestCore
                 fixtureLog.Error("Cleanup failed: " + ex);
                 GlobalTestFailure.HasFailed = true;
             }
+
+            // NUnit captures Console.Out for the entire test lifecycle (setup, test,
+            // teardown), so writes during the long WaitForCleanup period never reach
+            // pod stdout in real-time. Writing directly to the raw stdout stream
+            // bypasses that capture and flushes immediately.
+            //
+            // GKE's logging agent parses JSON lines as jsonPayload, so fields like
+            // jsonPayload.type and jsonPayload.fixture become queryable in Cloud Logging.
+            // The workflow "Generate test summary" step queries these entries to build
+            // the per-test summary without needing to parse NUnit runner output.
+            try
+            {
+                var result = GetTestResult();
+                var entry = new Dictionary<string, object>
+                {
+                    ["type"]     = "test-result",
+                    ["runid"]    = Environment.GetEnvironmentVariable("RUNID") ?? "",
+                    ["fixture"]  = NameUtils.GetRawFixtureName(),
+                    ["testname"] = NameUtils.GetTestMethodName(),
+                    ["status"]   = result.Status,
+                    ["success"]  = result.Success,
+                    ["duration"] = lifecycle.GetTestDuration().ToString(@"hh\:mm\:ss"),
+                };
+                using var raw = new StreamWriter(Console.OpenStandardOutput(), leaveOpen: true) { AutoFlush = true };
+                raw.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(entry));
+            }
+            catch
+            {
+                // Best-effort; don't fail the teardown if status emission fails.
+            }
         }
 
         public CoreInterface Ci
