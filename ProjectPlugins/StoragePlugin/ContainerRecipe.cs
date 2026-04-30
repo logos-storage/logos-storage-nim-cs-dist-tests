@@ -41,7 +41,7 @@ namespace StoragePlugin
 
             var dataDir = $"datadir{ContainerNumber}";
             AddEnvVar("STORAGE_DATA_DIR", dataDir);
-            AddVolume($"codex/{dataDir}", GetVolumeCapacity(config));
+            AddVolume($"logosstorage/{dataDir}", GetVolumeCapacity(config));
 
             var discPort = CreateDiscoveryPort(config);
             AddEnvVar("STORAGE_DISC_PORT", discPort);
