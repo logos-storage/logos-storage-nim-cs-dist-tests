@@ -14,7 +14,6 @@ namespace LogosStorageDiscordBotPlugin
             var config = startupConfig.Get<RewarderBotStartupConfig>();
 
             ScheduleInPoolsWithLabel("workload-type", "tests-pods");
-            AddToleration("cloud.google.com/gke-spot", "true", "NoSchedule");
 
             AddEnvVar("DISCORDBOTHOST", config.DiscordBotHost);
             AddEnvVar("DISCORDBOTPORT", config.DiscordBotPort.ToString());
