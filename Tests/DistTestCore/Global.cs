@@ -52,6 +52,10 @@ namespace DistTestCore
             {
                 GlobalTestFailure.HasFailed = true;
                 log.Error($"Global setup cleanup failed with: {ex}");
+                // Write directly to raw stderr so this is visible even when NUnit
+                // captures Console.Out/Console.Error for the fixture setup context.
+                using var err = new StreamWriter(Console.OpenStandardError(), leaveOpen: true) { AutoFlush = true };
+                err.WriteLine($"[global-setup-failure] {ex}");
                 throw;
             }
         }

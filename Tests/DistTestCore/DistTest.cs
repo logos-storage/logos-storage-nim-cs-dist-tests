@@ -100,9 +100,9 @@ namespace DistTestCore
                 using var raw = new StreamWriter(Console.OpenStandardOutput(), leaveOpen: true) { AutoFlush = true };
                 raw.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(entry));
             }
-            catch
+            catch (Exception ex)
             {
-                // Best-effort; don't fail the teardown if status emission fails.
+                Console.Error.WriteLine($"[test-result-emit] Failed: {ex}");
             }
         }
 
