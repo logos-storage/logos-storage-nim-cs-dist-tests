@@ -97,7 +97,7 @@ namespace DistTestCore
                     ["success"]  = result.Success,
                     ["duration"] = lifecycle.GetTestDuration().ToString(@"hh\:mm\:ss"),
                 };
-                using var raw = new StreamWriter(Console.OpenStandardOutput(), leaveOpen: true) { AutoFlush = true };
+                using var raw = new StreamWriter(Console.OpenStandardError(), leaveOpen: true) { AutoFlush = true };
                 raw.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(entry));
             }
             catch (Exception ex)
