@@ -31,6 +31,7 @@ namespace StoragePlugin
 
             // Schedule storage nodes on the tests node pool, away from the test runner.
             ScheduleInPoolsWithLabel("workload-type", "tests-pods");
+            AddToleration("cloud.google.com/gke-spot", "true", "NoSchedule");
 
             var config = startupConfig.Get<LogosStorageStartupConfig>();
 
