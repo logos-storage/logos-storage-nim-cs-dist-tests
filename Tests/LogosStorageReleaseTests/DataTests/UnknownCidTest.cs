@@ -23,8 +23,8 @@ namespace LogosStorageReleaseTests.DataTests
             }
             catch (Exception ex)
             {
-                var expectedMessage = $"Download of '{unknownCid.Id}' timed out";
-                if (!ex.Message.StartsWith(expectedMessage)) throw;
+                var expectedMessage = "Content specified by the CID is not found";
+                if (!ex.Message.Contains(expectedMessage)) throw;
             }
 
             WaitAndCheckNodesStaysAlive(TimeSpan.FromMinutes(2), node);
