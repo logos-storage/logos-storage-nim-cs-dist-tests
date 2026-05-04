@@ -66,7 +66,7 @@ namespace DistTestCore
                     },
                     Data = new Dictionary<string, string> { ["result"] = json }
                 };
-                k8sClient.CreateNamespacedConfigMap(cm, "default");
+                k8sClient.CoreV1.CreateNamespacedConfigMap(cm, "default");
             }
             catch { }
         }
