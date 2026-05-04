@@ -86,19 +86,19 @@ namespace DistTestCore
             // the per-test summary without needing to parse NUnit runner output.
             try
             {
+                var runId = Environment.GetEnvironmentVariable("RUNID") ?? "";
                 var result = GetTestResult();
                 var entry = new Dictionary<string, object>
                 {
                     ["type"]     = "test-result",
-                    ["runid"]    = Environment.GetEnvironmentVariable("RUNID") ?? "",
+                    ["runid"]    = runId,
                     ["fixture"]  = NameUtils.GetRawFixtureName(),
                     ["testname"] = NameUtils.GetTestMethodName(),
                     ["status"]   = result.Status,
                     ["success"]  = result.Success,
                     ["duration"] = lifecycle.GetTestDuration().ToString(@"hh\:mm\:ss"),
                 };
-                var json = Newtonsoft.Json.JsonConvert.SerializeObject(entry);
-                File.AppendAllText(Global.TestResultsFile, json + "\n");
+                Global.WriteTestResult(runId, Newtonsoft.Json.JsonConvert.SerializeObject(entry));
             }
             catch (Exception ex)
             {

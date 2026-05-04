@@ -1,6 +1,8 @@
 ﻿using System.Diagnostics;
 using System.Reflection;
 using Core;
+using k8s;
+using k8s.Models;
 using Logging;
 
 namespace DistTestCore
@@ -8,12 +10,21 @@ namespace DistTestCore
     public class Global
     {
         public const string TestNamespacePrefix = "storage-";
-        public static readonly string TestResultsFile = Path.Combine(Path.GetTempPath(), "test-results.jsonl");
         public Configuration Configuration { get; } = new Configuration();
 
         public Assembly[] TestAssemblies { get; }
         private readonly EntryPoint globalEntryPoint;
         private readonly ILog log;
+
+        private static readonly IKubernetes? k8sClient = CreateK8sClient();
+
+        private static IKubernetes? CreateK8sClient()
+        {
+            var kubeconfig = Environment.GetEnvironmentVariable("KUBECONFIG");
+            if (string.IsNullOrEmpty(kubeconfig)) return null;
+            var config = KubernetesClientConfiguration.BuildConfigFromConfigFile(kubeconfig);
+            return new Kubernetes(config);
+        }
 
         public Global()
         {
@@ -31,20 +42,37 @@ namespace DistTestCore
             );
         }
 
+        /// <summary>
+        /// Write test result to ConfigMap so it can be read from the workflow
+        /// </summary>
+        /// <param name="runId">RunId</param>
+        /// <param name="json">Json payload containing the test result</param>
+        public static void WriteTestResult(string runId, string json)
+        {
+            if (k8sClient == null) return;
+            try
+            {
+                var cm = new V1ConfigMap
+                {
+                    Metadata = new V1ObjectMeta
+                    {
+                        Name = $"test-result-{Guid.NewGuid():N}",
+                        NamespaceProperty = "default",
+                        Labels = new Dictionary<string, string>
+                        {
+                            ["runid"] = runId,
+                            ["app"] = "test-result"
+                        }
+                    },
+                    Data = new Dictionary<string, string> { ["result"] = json }
+                };
+                k8sClient.CreateNamespacedConfigMap(cm, "default");
+            }
+            catch { }
+        }
+
         public void Setup()
         {
-            // At process exit, write accumulated test-result JSON lines to stdout.
-            // ProcessExit fires after NUnit is completely done (no more output capture),
-            // so writes here go directly to the real stdout pipe and appear in Cloud Logging.
-            AppDomain.CurrentDomain.ProcessExit += (_, _) =>
-            {
-                if (!File.Exists(TestResultsFile)) return;
-                var raw = new StreamWriter(Console.OpenStandardOutput(), leaveOpen: true) { AutoFlush = true };
-                raw.Write(File.ReadAllText(TestResultsFile));
-            };
-
-            Console.SetOut(new StreamWriter(Console.OpenStandardOutput()) { AutoFlush = true });
-
             try
             {
                 Trace.Listeners.Add(new ConsoleTraceListener());
@@ -59,10 +87,6 @@ namespace DistTestCore
             {
                 GlobalTestFailure.HasFailed = true;
                 log.Error($"Global setup cleanup failed with: {ex}");
-                // Write directly to raw stderr so this is visible even when NUnit
-                // captures Console.Out/Console.Error for the fixture setup context.
-                using var err = new StreamWriter(Console.OpenStandardError(), leaveOpen: true) { AutoFlush = true };
-                err.WriteLine($"[global-setup-failure] {ex}");
                 throw;
             }
         }
