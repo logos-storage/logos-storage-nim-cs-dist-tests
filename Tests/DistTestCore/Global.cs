@@ -8,6 +8,7 @@ namespace DistTestCore
     public class Global
     {
         public const string TestNamespacePrefix = "storage-";
+        public static readonly string TestResultsFile = Path.Combine(Path.GetTempPath(), "test-results.jsonl");
         public Configuration Configuration { get; } = new Configuration();
 
         public Assembly[] TestAssemblies { get; }
@@ -32,10 +33,16 @@ namespace DistTestCore
 
         public void Setup()
         {
-            // Console.Out is block-buffered when stdout is non-interactive (e.g. in a container).
-            // Replace it with an auto-flushing wrapper so the NUnit runner's own "Passed/Failed"
-            // progress lines are written to pod stdout immediately after each test completes,
-            // rather than batching until process exit.
+            // At process exit, write accumulated test-result JSON lines to stdout.
+            // ProcessExit fires after NUnit is completely done (no more output capture),
+            // so writes here go directly to the real stdout pipe and appear in Cloud Logging.
+            AppDomain.CurrentDomain.ProcessExit += (_, _) =>
+            {
+                if (!File.Exists(TestResultsFile)) return;
+                var raw = new StreamWriter(Console.OpenStandardOutput(), leaveOpen: true) { AutoFlush = true };
+                raw.Write(File.ReadAllText(TestResultsFile));
+            };
+
             Console.SetOut(new StreamWriter(Console.OpenStandardOutput()) { AutoFlush = true });
 
             try
