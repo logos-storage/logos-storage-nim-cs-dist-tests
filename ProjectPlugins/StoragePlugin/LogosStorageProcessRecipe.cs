@@ -62,9 +62,10 @@ namespace StoragePlugin
             AddArg("--log-level", config.LogLevelWithTopics());
 
             // This makes the node announce itself to its local IP address.
-            AddArg("--nat", $"extip:{pc.LocalIpAddrs.ToString()}");
+            AddArg("--nat", $"extip:{pc.LocalIpAddrs}");
             
-            AddArg("--listen-addrs", $"/ip4/0.0.0.0/tcp/{pc.ListenPort}");
+            AddArg("--listen-port", $"{pc.ListenPort}");
+            AddArg("--listen-ip", $"{pc.LocalIpAddrs}");
 
             if (!string.IsNullOrEmpty(config.BootstrapSpr))
             {
