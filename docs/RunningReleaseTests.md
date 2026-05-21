@@ -185,19 +185,19 @@ If missing, create it or change the priority class name in [docker/job-release-t
 
 This is the standard automated path. The CI workflow provisions a fresh GKE cluster, runs the tests, then tears the cluster down — all in one job.
 
-**Required GitHub secrets:**
+**Required GitHub secrets** (Settings → Secrets and variables → Actions → **Secrets** tab):
 
 | Secret | Description |
 |---|---|
 | `RELEASE_TESTS_GCP_WORKLOAD_IDENTITY_PROVIDER` | Workload Identity Federation provider resource name |
 | `RELEASE_TESTS_GCP_SERVICE_ACCOUNT` | Service account email used by the workflow |
-| `RELEASE_TESTS_TF_STATE_BUCKET` | GCS bucket name for Terraform state |
 
 **Required GitHub variables** (Settings → Secrets and variables → Actions → **Variables** tab):
 
 | Variable | Description |
 |---|---|
-| `RELEASE_TESTS_GCP_PROJECT` | GCP project ID — stored as a variable (not a secret) so it appears unmasked in logs and in the Cloud Logging link printed during the run |
+| `RELEASE_TESTS_GCP_PROJECT` | GCP project ID — stored as a variable so it appears unmasked in logs and in the Cloud Logging link printed during the run |
+| `RELEASE_TESTS_TF_STATE_BUCKET` | GCS bucket name for Terraform state (e.g. `logos-storage-release-tests`) |
 
 **Required GCP setup (one-time):**
 
