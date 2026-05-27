@@ -11,7 +11,7 @@ namespace LogosStorageReleaseTests.DataTests
         [Test]
         public void OneClient()
         {
-            var node = StartLogosStorage();
+            var node = StartLogosStorage(s => s.WithLogFormat(LogosStorageLogFormat.Json));
 
             PerformOneClientTest(node);
 

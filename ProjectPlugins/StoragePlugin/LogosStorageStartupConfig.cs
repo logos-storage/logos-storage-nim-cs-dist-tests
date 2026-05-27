@@ -9,6 +9,7 @@ namespace StoragePlugin
         public string? NameOverride { get; set; }
         public ILocation Location { get; set; } = KnownLocations.UnspecifiedLocation;
         public LogosStorageLogLevel LogLevel { get; set; }
+        public LogosStorageLogFormat LogFormat { get; set; }
         public LogosStorageLogCustomTopics? CustomTopics { get; set; } = new LogosStorageLogCustomTopics(LogosStorageLogLevel.Info, LogosStorageLogLevel.Warn);
         public ByteSize? StorageQuota { get; set; }
         public bool MetricsEnabled { get; set; }

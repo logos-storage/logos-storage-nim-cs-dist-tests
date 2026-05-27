@@ -11,7 +11,7 @@ namespace LogosStorageReleaseTests.NodeTests
         [Test]
         public void PeerTableCompleteness()
         {
-            var nodes = StartLogosStorage(10);
+            var nodes = StartLogosStorage(10, s => s.WithLogFormat(LogosStorageLogFormat.Json));
 
             AssertAllNodesSeeEachOther(nodes.Concat([BootstrapNode!]));
         }

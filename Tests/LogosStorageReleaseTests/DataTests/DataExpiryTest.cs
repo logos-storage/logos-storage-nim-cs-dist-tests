@@ -2,6 +2,7 @@ using StoragePlugin;
 using LogosStorageTests;
 using NUnit.Framework;
 using Utils;
+using LogosStorageClient;
 
 namespace LogosStorageReleaseTests.DataTests
 {
@@ -24,7 +25,9 @@ namespace LogosStorageReleaseTests.DataTests
         public void DeletesExpiredData()
         {
             var fileSize = 3.MB();
-            var node = StartLogosStorage(s => WithFastBlockExpiry(s));
+            var node = StartLogosStorage(s =>
+                WithFastBlockExpiry(s).WithLogFormat(LogosStorageLogFormat.Json)
+            );
 
             var startSpace = node.Space();
             Assert.That(startSpace.QuotaUsedBytes, Is.EqualTo(0));

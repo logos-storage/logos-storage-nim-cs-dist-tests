@@ -1,4 +1,5 @@
-﻿using LogosStorageTests;
+﻿using LogosStorageClient;
+using LogosStorageTests;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
@@ -15,7 +16,7 @@ namespace LogosStorageReleaseTests.DataTests
         [Test]
         public void ShouldShowLocalFiles()
         {
-            var node = StartLogosStorage();
+            var node = StartLogosStorage(s => s.WithLogFormat(LogosStorageLogFormat.Json));
 
             var size1 = 123.KB();
             var size2 = 23.MB();

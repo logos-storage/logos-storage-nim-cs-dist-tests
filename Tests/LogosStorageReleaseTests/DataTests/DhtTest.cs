@@ -31,7 +31,10 @@ namespace LogosStorageReleaseTests.DataTests.DHT
         public void PressureTest()
         {
             var cids = new List<ContentId>();
-            var nodes = StartLogosStorage(numNodes);
+            var nodes = StartLogosStorage(
+                numNodes,
+                s => s.WithLogFormat(LogosStorageLogFormat.Json)
+            );
 
             for (var i = 0; i < numFilesPerNode; i++)
             {
@@ -45,7 +48,7 @@ namespace LogosStorageReleaseTests.DataTests.DHT
             var estimate = numNodes * numFilesPerNode * 2;
             Log($"Estimate of DHT records: {estimate}");
 
-            var node = StartLogosStorage();
+            var node = StartLogosStorage(s => s.WithLogFormat(LogosStorageLogFormat.Json));
             for (var i = 0; i < numToFetch; i++)
             {
                 var timing = Stopwatch.Measure(GetTestLog(), nameof(PressureTest) + i, () =>

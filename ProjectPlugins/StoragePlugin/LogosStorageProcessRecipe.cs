@@ -60,6 +60,7 @@ namespace StoragePlugin
 
             AddArg("--disc-port", pc.DiscPort);
             AddArg("--log-level", config.LogLevelWithTopics());
+            AddArg("--log-format", config.LogFormat.ToString().ToLowerInvariant());
 
             // This makes the node announce itself to its local IP address.
             AddArg("--nat", $"extip:{pc.LocalIpAddrs}");
