@@ -1,4 +1,5 @@
-﻿using LogosStorageTests;
+﻿using LogosStorageClient;
+using LogosStorageTests;
 using NUnit.Framework;
 using Utils;
 
@@ -11,7 +12,9 @@ namespace LogosStorageReleaseTests.NodeTests
         public void QuotaTest()
         {
             var size = 3.GB();
-            var node = StartLogosStorage(s => s.WithStorageQuota(size));
+            var node = StartLogosStorage(s =>
+                s.WithStorageQuota(size).WithLogFormat(LogosStorageLogFormat.Json)
+            );
             var space = node.Space();
 
             Assert.That(space.QuotaMaxBytes, Is.EqualTo(size.SizeInBytes));
@@ -20,8 +23,8 @@ namespace LogosStorageReleaseTests.NodeTests
         [Test]
         public void Spr()
         {
-            var node = StartLogosStorage();
-            
+            var node = StartLogosStorage(s => s.WithLogFormat(LogosStorageLogFormat.Json));
+
             var info = node.GetDebugInfo();
             Assert.That(!string.IsNullOrEmpty(info.Spr));
 
@@ -34,7 +37,7 @@ namespace LogosStorageReleaseTests.NodeTests
         [Test]
         public void VersionInfo()
         {
-            var node = StartLogosStorage();
+            var node = StartLogosStorage(s => s.WithLogFormat(LogosStorageLogFormat.Json));
 
             var info = node.GetDebugInfo();
             Assert.That(!string.IsNullOrEmpty(info.Version.Version));
@@ -44,7 +47,7 @@ namespace LogosStorageReleaseTests.NodeTests
         [Test]
         public void AnnounceAddress()
         {
-            var node = StartLogosStorage();
+            var node = StartLogosStorage(s => s.WithLogFormat(LogosStorageLogFormat.Json));
             var addr = node.GetListenEndpoint();
 
             var info = node.GetDebugInfo();

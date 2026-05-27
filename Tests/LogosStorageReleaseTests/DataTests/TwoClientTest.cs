@@ -1,7 +1,7 @@
 ﻿using LogosStorageClient;
-using StoragePlugin;
 using LogosStorageTests;
 using NUnit.Framework;
+using StoragePlugin;
 using Utils;
 
 namespace LogosStorageReleaseTests.DataTests
@@ -12,8 +12,14 @@ namespace LogosStorageReleaseTests.DataTests
         [Test]
         public void TwoClientTest()
         {
-            var uploader = StartLogosStorage(s => s.WithName("Uploader"));
-            var downloader = StartLogosStorage(s => s.WithName("Downloader").WithBootstrapNode(uploader));
+            var uploader = StartLogosStorage(s =>
+                s.WithName("Uploader").WithLogFormat(LogosStorageLogFormat.Json)
+            );
+            var downloader = StartLogosStorage(s =>
+                s.WithName("Downloader")
+                    .WithBootstrapNode(uploader)
+                    .WithLogFormat(LogosStorageLogFormat.Json)
+            );
 
             PerformTwoClientTest(uploader, downloader);
         }
@@ -29,8 +35,17 @@ namespace LogosStorageReleaseTests.DataTests
                 return;
             }
 
-            var uploader = Ci.StartStorageNode(s => s.WithName("Uploader").At(locations.Get(0)));
-            var downloader = Ci.StartStorageNode(s => s.WithName("Downloader").WithBootstrapNode(uploader).At(locations.Get(1)));
+            var uploader = Ci.StartStorageNode(s =>
+                s.WithName("Uploader")
+                    .At(locations.Get(0))
+                    .WithLogFormat(LogosStorageLogFormat.Json)
+            );
+            var downloader = Ci.StartStorageNode(s =>
+                s.WithName("Downloader")
+                    .WithBootstrapNode(uploader)
+                    .At(locations.Get(1))
+                    .WithLogFormat(LogosStorageLogFormat.Json)
+            );
 
             PerformTwoClientTest(uploader, downloader);
         }

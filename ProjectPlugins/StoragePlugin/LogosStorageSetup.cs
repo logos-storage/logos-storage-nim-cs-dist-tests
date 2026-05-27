@@ -11,6 +11,7 @@ namespace StoragePlugin
         ILogosStorageSetup WithBootstrapNode(IStorageNode node);
         ILogosStorageSetup WithLogLevel(LogosStorageLogLevel level);
         ILogosStorageSetup WithLogLevel(LogosStorageLogLevel level, LogosStorageLogCustomTopics customTopics);
+        ILogosStorageSetup WithLogFormat(LogosStorageLogFormat format);
         ILogosStorageSetup WithStorageQuota(ByteSize storageQuota);
         ILogosStorageSetup WithBlockTTL(TimeSpan duration);
         ILogosStorageSetup WithBlockMaintenanceInterval(TimeSpan duration);
@@ -79,6 +80,12 @@ namespace StoragePlugin
         {
             LogLevel = level;
             CustomTopics = customTopics;
+            return this;
+        }
+
+        public ILogosStorageSetup WithLogFormat(LogosStorageLogFormat format)
+        {
+            LogFormat = format;
             return this;
         }
 

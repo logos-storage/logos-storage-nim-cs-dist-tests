@@ -1,4 +1,5 @@
-﻿using LogosStorageTests;
+﻿using LogosStorageClient;
+using LogosStorageTests;
 using NUnit.Framework;
 using Utils;
 
@@ -9,8 +10,8 @@ namespace LogosStorageReleaseTests.DataTests
         [Test]
         public void ThreeClient()
         {
-            var primary = StartLogosStorage();
-            var secondary = StartLogosStorage();
+            var primary = StartLogosStorage(s => s.WithLogFormat(LogosStorageLogFormat.Json));
+            var secondary = StartLogosStorage(s => s.WithLogFormat(LogosStorageLogFormat.Json));
 
             var testFile = GenerateTestFile(10.MB());
 

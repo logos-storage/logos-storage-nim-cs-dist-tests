@@ -10,7 +10,7 @@ namespace LogosStorageReleaseTests.DataTests
         [Test]
         public void DownloadingUnknownCidDoesNotCauseCrash()
         {
-            var node = StartLogosStorage();
+            var node = StartLogosStorage(s => s.WithLogFormat(LogosStorageLogFormat.Json));
 
             var unknownCid = new ContentId("zDvZRwzkzHsok3Z8yMoiXE9EDBFwgr8WygB8s4ddcLzzSwwXAxLZ");
 

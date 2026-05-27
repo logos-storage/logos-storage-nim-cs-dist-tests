@@ -1,4 +1,5 @@
-﻿using LogosStorageTests;
+﻿using LogosStorageClient;
+using LogosStorageTests;
 using NUnit.Framework;
 using Utils;
 
@@ -10,8 +11,10 @@ namespace LogosStorageReleaseTests.DataTests
         [Test]
         public void ManifestOnlyTest()
         {
-            var uploader = StartLogosStorage();
-            var downloader = StartLogosStorage(s => s.WithBootstrapNode(uploader));
+            var uploader = StartLogosStorage(s => s.WithLogFormat(LogosStorageLogFormat.Json));
+            var downloader = StartLogosStorage(s =>
+                s.WithBootstrapNode(uploader).WithLogFormat(LogosStorageLogFormat.Json)
+            );
 
             var file = GenerateTestFile(2.GB());
             var size = file.GetFilesize().SizeInBytes;

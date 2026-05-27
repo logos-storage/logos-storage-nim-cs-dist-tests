@@ -29,7 +29,13 @@ namespace LogosStorageReleaseTests.DataTests
             Assert.That(remainingNodes, Is.GreaterThan(0));
             Assert.That(steps, Is.GreaterThan(remainingNodes + 1));
 
-            nodes.AddRange(StartLogosStorage(remainingNodes + 1));
+            nodes.AddRange(
+                StartLogosStorage(
+                    remainingNodes + 1,
+                    s => s.WithLogFormat(LogosStorageLogFormat.Json)
+                )
+            );
+
             cid = nodes.First().UploadFile(file);
 
             AllNodesHaveFile();
@@ -40,7 +46,7 @@ namespace LogosStorageReleaseTests.DataTests
                 nodes[0].Stop(waitTillStopped: true);
                 nodes.RemoveAt(0);
 
-                nodes.Add(StartLogosStorage());
+                nodes.Add(StartLogosStorage(s => s.WithLogFormat(LogosStorageLogFormat.Json)));
 
                 AllNodesHaveFile();
             }

@@ -12,7 +12,7 @@ namespace LogosStorageReleaseTests.DataTests
         [Test]
         public void UploadInterruptTest()
         {
-            var nodes = StartLogosStorage(10);
+            var nodes = StartLogosStorage(10, s => s.WithLogFormat(LogosStorageLogFormat.Json));
 
             var tasks = nodes.Select(n => Task<bool>.Run(() => RunInterruptUploadTest(n)));
             Task.WaitAll(tasks.ToArray());

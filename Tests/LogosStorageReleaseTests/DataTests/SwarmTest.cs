@@ -40,7 +40,10 @@ namespace LogosStorageReleaseTests.DataTests
             public void Stream()
             {
                 var filesize = filesizeMb.MB();
-                nodes = StartLogosStorage(numberOfNodes);
+                nodes = StartLogosStorage(
+                    numberOfNodes,
+                    s => s.WithLogFormat(LogosStorageLogFormat.Json)
+                );
                 var files = nodes.Select(n => UploadUniqueFilePerNode(n, filesize)).ToArray();
 
                 var tasks = ParallelDownloadEachFile(files);
@@ -53,7 +56,10 @@ namespace LogosStorageReleaseTests.DataTests
             public void Streamless()
             {
                 var filesize = filesizeMb.MB();
-                nodes = StartLogosStorage(numberOfNodes);
+                nodes = StartLogosStorage(
+                    numberOfNodes,
+                    s => s.WithLogFormat(LogosStorageLogFormat.Json)
+                );
                 var files = nodes.Select(n => UploadUniqueFilePerNode(n, filesize)).ToArray();
 
                 var tasks = ParallelStreamlessDownloadEachFile(files);
