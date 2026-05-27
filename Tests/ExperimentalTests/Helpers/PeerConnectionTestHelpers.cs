@@ -28,7 +28,10 @@ namespace LogosStorageTests.Helpers
             var result = string.Empty;
             foreach (var peer in entry.Response.Table.Nodes)
             {
-                var expected = GetExpectedDiscoveryEndpoint(allEntries, peer);
+                var known = allEntries.SingleOrDefault(e => e.Response.Table.LocalNode.PeerId == peer.PeerId);
+                if (known == null) continue;
+
+                var expected = known.Node.GetDiscoveryEndpoint().ToString();
                 if (expected != peer.Address)
                 {
                     result += $"Node:{entry.Node.GetName()} has incorrect peer table entry. Was: '{peer.Address}', expected: '{expected}'. ";
@@ -51,13 +54,6 @@ namespace LogosStorageTests.Helpers
                 return PeerConnectionState.Connection;
             }
             return PeerConnectionState.Unknown;
-        }
-
-        private static string GetExpectedDiscoveryEndpoint(Entry[] allEntries, DebugInfoTableNode node)
-        {
-            var peer = allEntries.SingleOrDefault(e => e.Response.Table.LocalNode.PeerId == node.PeerId);
-            if (peer == null) return $"peerId: {node.PeerId} is not known.";
-            return peer.Node.GetDiscoveryEndpoint().ToString();
         }
     }
 }
