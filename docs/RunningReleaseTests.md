@@ -34,6 +34,16 @@ If the current context is not `docker-desktop` (e.g. it points to a remote clust
 kubectl config use-context docker-desktop
 ```
 
+#### Label the Docker Desktop node (one-time setup)
+
+Storage pods require the node label `workload-type=tests-pods`. Docker Desktop's node does not have this label by default, so pods will remain in `Pending` indefinitely without it. Apply it once:
+
+```bash
+kubectl label node docker-desktop workload-type=tests-pods
+```
+
+This label persists across `dotnet test` runs but is lost if you reset Kubernetes in Docker Desktop (Settings → Kubernetes → Reset Kubernetes Cluster). Re-apply it after any reset.
+
 ### Run the tests
 
 Most IDEs let you run individual tests or test fixtures directly from the code file. To run from the command line:
@@ -96,6 +106,16 @@ kubectl config current-context      # confirm "docker-desktop"
 kubectl config use-context docker-desktop   # switch if needed
 kubectl get nodes                   # should show a Ready node
 ```
+
+**Tests time out with "Pod IP unknown" / pods stuck in `Pending`**
+
+Storage pods require a node labelled `workload-type=tests-pods`. If that label is missing, the scheduler cannot place any pods and every test times out after ~15 minutes. Apply the label (see [Label the Docker Desktop node](#label-the-docker-desktop-node-one-time-setup) above):
+
+```bash
+kubectl label node docker-desktop workload-type=tests-pods
+```
+
+The label is wiped by a Kubernetes reset in Docker Desktop — re-apply it afterwards.
 
 **Image not found**
 
