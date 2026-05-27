@@ -14,7 +14,7 @@ namespace LogosStorageTests
         public void SetupBootstrapNode()
         {
             isBooting = true;
-            BootstrapNode = StartLogosStorage(s => s.WithName("BOOTSTRAP_" + GetTestNamespace()));
+            BootstrapNode = StartLogosStorage(s => s.WithName("BOOTSTRAP_" + GetTestNamespace()).WithLogFormat(LogosStorageLogFormat.Json));
             isBooting = false;
         }
 
