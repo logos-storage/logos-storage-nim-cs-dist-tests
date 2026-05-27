@@ -46,6 +46,7 @@ namespace StoragePlugin
             var discPort = CreateDiscoveryPort(config);
             AddEnvVar("STORAGE_DISC_PORT", discPort);
             AddEnvVar("STORAGE_LOG_LEVEL", config.LogLevelWithTopics());
+            AddEnvVar("STORAGE_LOG_FORMAT", config.LogFormat.ToString().ToLowerInvariant());
 
             if (config.PublicTestNet != null)
             {
