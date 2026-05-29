@@ -13,6 +13,7 @@ namespace StoragePlugin
         public LogosStorageLogCustomTopics? CustomTopics { get; set; } = new LogosStorageLogCustomTopics(LogosStorageLogLevel.Info, LogosStorageLogLevel.Warn);
         public ByteSize? StorageQuota { get; set; }
         public bool MetricsEnabled { get; set; }
+        public bool NoBootstrapNodes { get; set; }
         public string? BootstrapSpr { get; set; }
         public int? BlockTTL { get; set; }
         public bool? EnableValidator { get; set; }

@@ -72,6 +72,10 @@ namespace StoragePlugin
             {
                 AddArg("--bootstrap-node", config.BootstrapSpr);
             }
+            if (config.NoBootstrapNodes)
+            {
+                AddArg("--no-bootstrap-node");
+            }
             if (config.StorageQuota != null)
             {
                 AddArg("--storage-quota", config.StorageQuota.SizeInBytes.ToString()!);
@@ -120,6 +124,11 @@ namespace StoragePlugin
         private void AddArg(string arg, int val)
         {
             args.Add($"{arg}={val}");
+        }
+
+        private void AddArg(string arg)
+        {
+            args.Add(arg);
         }
     }
 }
