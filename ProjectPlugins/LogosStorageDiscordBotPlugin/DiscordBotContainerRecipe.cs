@@ -16,7 +16,6 @@ namespace LogosStorageDiscordBotPlugin
             var config = startupConfig.Get<DiscordBotStartupConfig>();
 
             ScheduleInPoolsWithLabel("workload-type", "tests-pods");
-            AddToleration("cloud.google.com/gke-spot", "true", "NoSchedule");
 
             AddEnvVar("TOKEN", config.Token);
             AddEnvVar("SERVERNAME", config.ServerName);
