@@ -67,6 +67,10 @@ namespace StoragePlugin
             {
                 AddEnvVar("STORAGE_BOOTSTRAP_NODE", config.BootstrapSpr);
             }
+            if (config.NoBootstrapNodes)
+            {
+                AddEnvVar("STORAGE_NO_BOOTSTRAP_NODE", "true");
+            }
             if (config.StorageQuota != null)
             {
                 AddEnvVar("STORAGE_STORAGE_QUOTA", config.StorageQuota.SizeInBytes.ToString()!);
