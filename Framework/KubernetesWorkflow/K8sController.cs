@@ -143,7 +143,7 @@ namespace KubernetesWorkflow
             log.Debug();
             if (IsNamespaceOnline(K8sNamespace))
             {
-                DeleteAllPvcsInNamespace(K8sNamespace);
+                PrepareNamespaceForDeletion(K8sNamespace);
                 client.Run(c => c.DeleteNamespace(K8sNamespace, null, null, gracePeriodSeconds: 0));
 
                 if (wait) WaitUntilNamespaceDeleted(K8sNamespace);
@@ -155,12 +155,74 @@ namespace KubernetesWorkflow
             log.Debug();
             if (IsNamespaceOnline(ns))
             {
-                DeleteAllPvcsInNamespace(ns);
+                PrepareNamespaceForDeletion(ns);
                 client.Run(c => c.DeleteNamespace(ns, null, null, gracePeriodSeconds: 0));
                 if (wait) WaitUntilNamespaceDeleted(ns);
             }
         }
 
+        /// <summary>
+        /// Ensures all pods are stopped and all PVCs are deleted before the namespace
+        /// is removed. This guarantees the underlying GCE PDs are released by the time
+        /// the namespace deletion is issued.
+        /// </summary>
+        private void PrepareNamespaceForDeletion(string ns)
+        {
+            ForceDeleteAllPodsInNamespace(ns);
+            WaitUntilAllPodsInNamespaceAreGone(ns);
+            DeleteAllPvcsInNamespace(ns);
+        }
+
+        /// <summary>
+        /// Sends a SIGKILL (gracePeriodSeconds=0) delete request for every pod in the
+        /// namespace. Individual failures are logged and skipped so one stuck pod does
+        /// not prevent the rest from being force-deleted.
+        /// </summary>
+        private void ForceDeleteAllPodsInNamespace(string ns)
+        {
+            var pods = client.Run(c => c.ListNamespacedPod(ns));
+            foreach (var pod in pods.Items)
+            {
+                try
+                {
+                    client.Run(c => c.DeleteNamespacedPod(pod.Name(), ns, gracePeriodSeconds: 0));
+                    log.Debug($"Force-deleted pod '{pod.Name()}' in namespace '{ns}'.");
+                }
+                catch (k8s.Autorest.HttpOperationException ex)
+                {
+                    log.Error($"Failed to force-delete pod '{pod.Name()}' in namespace '{ns}': {ex.Response.ReasonPhrase}");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Polls until no pods remain in the namespace, or until the 2-minute timeout
+        /// expires. On timeout the error is logged and execution continues: PVC deletion
+        /// will still be attempted with the finalizer removed (see DeleteAllPvcsInNamespace).
+        /// </summary>
+        private void WaitUntilAllPodsInNamespaceAreGone(string ns)
+        {
+            try
+            {
+                Time.WaitUntil(
+                    () => !client.Run(c => c.ListNamespacedPod(ns)).Items.Any(),
+                    TimeSpan.FromMinutes(2),
+                    TimeSpan.FromSeconds(5),
+                    $"WaitUntilAllPodsInNamespaceAreGone:{ns}");
+            }
+            catch (TimeoutException)
+            {
+                log.Error($"Timed out waiting for pods in namespace '{ns}' to stop. Proceeding with PVC deletion.");
+            }
+        }
+
+        /// <summary>
+        /// Removes the kubernetes.io/pvc-protection finalizer from each PVC then deletes
+        /// it. The finalizer is always patched off unconditionally: it is a no-op when
+        /// already absent, and it ensures deletion succeeds even when pods are still
+        /// present after a force-delete timeout (which would otherwise leave the PVC
+        /// stuck in Terminating and the backing GCE disk allocated indefinitely).
+        /// </summary>
         private void DeleteAllPvcsInNamespace(string ns)
         {
             var pvcs = client.Run(c => c.ListNamespacedPersistentVolumeClaim(ns));
@@ -168,6 +230,8 @@ namespace KubernetesWorkflow
             {
                 try
                 {
+                    var patch = new V1Patch("{\"metadata\":{\"finalizers\":[]}}", V1Patch.PatchType.MergePatch);
+                    client.Run(c => c.PatchNamespacedPersistentVolumeClaim(patch, pvc.Name(), ns));
                     client.Run(c => c.DeleteNamespacedPersistentVolumeClaim(pvc.Name(), ns));
                     log.Debug($"Deleted PVC '{pvc.Name()}' in namespace '{ns}'.");
                 }
