@@ -60,6 +60,7 @@ namespace KubernetesWorkflow
             if (startResult.InternalService != null) DeleteService(startResult.InternalService);
             if (startResult.ExternalService != null) DeleteService(startResult.ExternalService);
             DeleteDeployment(startResult.Deployment);
+            DeletePvcsForRecipes(startResult.ContainerRecipes);
 
             if (waitTillStopped) WaitUntilPodsForDeploymentAreOffline(startResult.Deployment);
         }
@@ -390,6 +391,28 @@ namespace KubernetesWorkflow
         {
             client.Run(c => c.DeleteNamespacedDeployment(deployment.Name, K8sNamespace));
             WaitUntilDeploymentOffline(deployment.Name);
+        }
+
+        private void DeletePvcsForRecipes(ContainerRecipe[] recipes)
+        {
+            var pvcNames = recipes
+                .SelectMany(r => r.Volumes)
+                .Where(v => string.IsNullOrEmpty(v.HostPath) && string.IsNullOrEmpty(v.Secret))
+                .Select(v => v.VolumeName)
+                .Distinct();
+
+            foreach (var name in pvcNames)
+            {
+                try
+                {
+                    client.Run(c => c.DeleteNamespacedPersistentVolumeClaim(name, K8sNamespace));
+                    log.Debug($"Deleted PVC '{name}' in namespace '{K8sNamespace}'.");
+                }
+                catch (k8s.Autorest.HttpOperationException ex)
+                {
+                    log.Error($"Failed to delete PVC '{name}': {ex.Response.ReasonPhrase}");
+                }
+            }
         }
 
         private IDictionary<string, string> CreateNodeSelector(ILocation location, ContainerRecipe[] recipes)
