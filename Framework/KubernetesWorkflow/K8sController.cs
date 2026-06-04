@@ -162,66 +162,25 @@ namespace KubernetesWorkflow
         }
 
         /// <summary>
-        /// Ensures all pods are stopped and all PVCs are deleted before the namespace
-        /// is removed. This guarantees the underlying GCE PDs are released by the time
-        /// the namespace deletion is issued.
+        /// Deletes all PVCs in the namespace before it is removed, ensuring the backing
+        /// GCE PDs are released. Must be called before the namespace deletion API call.
         /// </summary>
         private void PrepareNamespaceForDeletion(string ns)
         {
-            ForceDeleteAllPodsInNamespace(ns);
-            WaitUntilAllPodsInNamespaceAreGone(ns);
             DeleteAllPvcsInNamespace(ns);
         }
 
         /// <summary>
-        /// Sends a SIGKILL (gracePeriodSeconds=0) delete request for every pod in the
-        /// namespace. Individual failures are logged and skipped so one stuck pod does
-        /// not prevent the rest from being force-deleted.
-        /// </summary>
-        private void ForceDeleteAllPodsInNamespace(string ns)
-        {
-            var pods = client.Run(c => c.ListNamespacedPod(ns));
-            foreach (var pod in pods.Items)
-            {
-                try
-                {
-                    client.Run(c => c.DeleteNamespacedPod(pod.Name(), ns, gracePeriodSeconds: 0));
-                    log.Debug($"Force-deleted pod '{pod.Name()}' in namespace '{ns}'.");
-                }
-                catch (k8s.Autorest.HttpOperationException ex)
-                {
-                    log.Error($"Failed to force-delete pod '{pod.Name()}' in namespace '{ns}': {ex.Response.ReasonPhrase}");
-                }
-            }
-        }
-
-        /// <summary>
-        /// Polls until no pods remain in the namespace, or until the 2-minute timeout
-        /// expires. On timeout the error is logged and execution continues: PVC deletion
-        /// will still be attempted with the finalizer removed (see DeleteAllPvcsInNamespace).
-        /// </summary>
-        private void WaitUntilAllPodsInNamespaceAreGone(string ns)
-        {
-            try
-            {
-                Time.WaitUntil(
-                    () => !client.Run(c => c.ListNamespacedPod(ns)).Items.Any(),
-                    TimeSpan.FromMinutes(2),
-                    TimeSpan.FromSeconds(5),
-                    $"WaitUntilAllPodsInNamespaceAreGone:{ns}");
-            }
-            catch (TimeoutException)
-            {
-                log.Error($"Timed out waiting for pods in namespace '{ns}' to stop. Proceeding with PVC deletion.");
-            }
-        }
-
-        /// <summary>
         /// Removes the kubernetes.io/pvc-protection finalizer from each PVC then deletes
-        /// it. The finalizer is always patched off unconditionally: it is a no-op when
-        /// already absent, and it ensures deletion succeeds even when pods are still
-        /// present after a force-delete timeout (which would otherwise leave the PVC
-        /// stuck in Terminating and the backing GCE disk allocated indefinitely).
+        /// it. The finalizer is patched off unconditionally — it is a no-op when already
+        /// absent, and it guarantees deletion succeeds even when pods still reference the
+        /// PVC (which would otherwise leave the PVC stuck in Terminating and the backing
+        /// GCE disk allocated indefinitely).
+        ///
+        /// Note: deleting individual pods owned by a Deployment does not prevent pod
+        /// recreation (the ReplicaSet controller replaces them immediately). The finalizer
+        /// patch is therefore the correct mechanism here; namespace deletion handles pod
+        /// cleanup via the Deployment cascade.
         /// </summary>
         private void DeleteAllPvcsInNamespace(string ns)
         {
