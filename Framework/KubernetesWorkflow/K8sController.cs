@@ -120,21 +120,23 @@ namespace KubernetesWorkflow
             log.Debug();
 
             var all = client.Run(c => c.ListNamespace().Items);
-            var namespaces = all.Select(n => n.Name()).Where(n => n.StartsWith(prefix));
+            var namespaces = all.Select(n => n.Name()).Where(n => n.StartsWith(prefix)).ToArray();
 
-            if (wait)
-            {
-                // If we're going to wait, trigger the delete for all the namespaces immediately.
-                // Then wait for them to finish one by one.
-                foreach (var ns in namespaces)
-                {
-                    DeleteNamespace(ns, false);
-                }
-            }
-
+            // Trigger all deletions without waiting so they proceed in parallel.
             foreach (var ns in namespaces)
             {
-                DeleteNamespace(ns, wait);
+                DeleteNamespace(ns, false);
+            }
+
+            // Optionally wait for each namespace to finish, one by one.
+            // Separated from the trigger loop to avoid re-entering PrepareNamespaceForDeletion
+            // on namespaces already in Terminating state (IsNamespaceOnline returns true for those).
+            if (wait)
+            {
+                foreach (var ns in namespaces)
+                {
+                    WaitUntilNamespaceDeleted(ns);
+                }
             }
         }
 
