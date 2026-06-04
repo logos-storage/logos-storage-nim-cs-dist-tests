@@ -1,7 +1,8 @@
-﻿.vs
+.vs
 obj
 bin
 .vscode
 Tools/AutoClient/datapath
 .editorconfig
 .DS_Store
+dotnet-tools.json
