@@ -145,7 +145,7 @@ namespace KubernetesWorkflow
             log.Debug();
             if (IsNamespaceOnline(K8sNamespace))
             {
-                PrepareNamespaceForDeletion(K8sNamespace);
+                DeleteAllPvcsInNamespace(K8sNamespace);
                 client.Run(c => c.DeleteNamespace(K8sNamespace, null, null, gracePeriodSeconds: 0));
 
                 if (wait) WaitUntilNamespaceDeleted(K8sNamespace);
@@ -157,33 +157,12 @@ namespace KubernetesWorkflow
             log.Debug();
             if (IsNamespaceOnline(ns))
             {
-                PrepareNamespaceForDeletion(ns);
+                DeleteAllPvcsInNamespace(ns);
                 client.Run(c => c.DeleteNamespace(ns, null, null, gracePeriodSeconds: 0));
                 if (wait) WaitUntilNamespaceDeleted(ns);
             }
         }
 
-        /// <summary>
-        /// Deletes all PVCs in the namespace before it is removed, ensuring the backing
-        /// GCE PDs are released. Must be called before the namespace deletion API call.
-        /// </summary>
-        private void PrepareNamespaceForDeletion(string ns)
-        {
-            DeleteAllPvcsInNamespace(ns);
-        }
-
-        /// <summary>
-        /// Removes the kubernetes.io/pvc-protection finalizer from each PVC then deletes
-        /// it. The finalizer is patched off unconditionally — it is a no-op when already
-        /// absent, and it guarantees deletion succeeds even when pods still reference the
-        /// PVC (which would otherwise leave the PVC stuck in Terminating and the backing
-        /// GCE disk allocated indefinitely).
-        ///
-        /// Note: deleting individual pods owned by a Deployment does not prevent pod
-        /// recreation (the ReplicaSet controller replaces them immediately). The finalizer
-        /// patch is therefore the correct mechanism here; namespace deletion handles pod
-        /// cleanup via the Deployment cascade.
-        /// </summary>
         private void DeleteAllPvcsInNamespace(string ns)
         {
             var pvcs = client.Run(c => c.ListNamespacedPersistentVolumeClaim(ns));
@@ -191,10 +170,11 @@ namespace KubernetesWorkflow
             {
                 try
                 {
+                    var pvName = pvc.Spec.VolumeName;
                     var patch = new V1Patch("{\"metadata\":{\"finalizers\":[]}}", V1Patch.PatchType.MergePatch);
                     client.Run(c => c.PatchNamespacedPersistentVolumeClaim(patch, pvc.Name(), ns));
                     client.Run(c => c.DeleteNamespacedPersistentVolumeClaim(pvc.Name(), ns));
-                    log.Debug($"Deleted PVC '{pvc.Name()}' in namespace '{ns}'.");
+                    log.Debug($"Deleted PVC '{pvc.Name()}' (PV: '{pvName}') in namespace '{ns}'.");
                 }
                 catch (k8s.Autorest.HttpOperationException ex)
                 {
