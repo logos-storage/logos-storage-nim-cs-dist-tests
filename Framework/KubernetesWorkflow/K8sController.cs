@@ -570,8 +570,6 @@ namespace KubernetesWorkflow
 
         private V1Volume CreateVolume(VolumeMount v)
         {
-            CreatePersistentVolumeClaimIfNeeded(v);
-
             if (!string.IsNullOrEmpty(v.HostPath))
             {
                 return new V1Volume
@@ -596,34 +594,11 @@ namespace KubernetesWorkflow
             return new V1Volume
             {
                 Name = v.VolumeName,
-                PersistentVolumeClaim = new V1PersistentVolumeClaimVolumeSource
+                EmptyDir = new V1EmptyDirVolumeSource
                 {
-                    ClaimName = v.VolumeName
+                    SizeLimit = v.ResourceQuantity != null ? new ResourceQuantity(v.ResourceQuantity) : null
                 }
             };
-        }
-
-        private void CreatePersistentVolumeClaimIfNeeded(VolumeMount v)
-        {
-            var pvcs = client.Run(c => c.ListNamespacedPersistentVolumeClaim(K8sNamespace));
-            if (pvcs != null && pvcs.Items.Any(i => i.Name() == v.VolumeName)) return;
-
-            client.Run(c => c.CreateNamespacedPersistentVolumeClaim(new V1PersistentVolumeClaim
-            {
-                ApiVersion = "v1",
-                Metadata = new V1ObjectMeta
-                {
-                    Name = v.VolumeName,
-                },
-                Spec = new V1PersistentVolumeClaimSpec
-                {
-                    AccessModes = new List<string>
-                    {
-                        "ReadWriteOnce"
-                    },
-                    Resources = CreateVolumeResourceRequirements(v),
-                },
-            }, K8sNamespace));
         }
 
         private V1SecretVolumeSource CreateVolumeSecret(VolumeMount v)
@@ -632,18 +607,6 @@ namespace KubernetesWorkflow
             return new V1SecretVolumeSource
             {
                 SecretName = v.Secret
-            };
-        }
-
-        private V1VolumeResourceRequirements CreateVolumeResourceRequirements(VolumeMount v)
-        {
-            if (v.ResourceQuantity == null) return null!;
-            return new V1VolumeResourceRequirements
-            {
-                Requests = new Dictionary<string, ResourceQuantity>()
-                {
-                    {"storage", new ResourceQuantity(v.ResourceQuantity) }
-                }
             };
         }
 
