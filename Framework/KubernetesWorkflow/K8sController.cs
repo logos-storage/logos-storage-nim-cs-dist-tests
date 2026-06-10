@@ -145,7 +145,6 @@ namespace KubernetesWorkflow
             log.Debug();
             if (IsNamespaceOnline(K8sNamespace))
             {
-                DeleteAllPvcsInNamespace(K8sNamespace);
                 client.Run(c => c.DeleteNamespace(K8sNamespace, null, null, gracePeriodSeconds: 0));
 
                 if (wait) WaitUntilNamespaceDeleted(K8sNamespace);
@@ -157,29 +156,8 @@ namespace KubernetesWorkflow
             log.Debug();
             if (IsNamespaceOnline(ns))
             {
-                DeleteAllPvcsInNamespace(ns);
                 client.Run(c => c.DeleteNamespace(ns, null, null, gracePeriodSeconds: 0));
                 if (wait) WaitUntilNamespaceDeleted(ns);
-            }
-        }
-
-        private void DeleteAllPvcsInNamespace(string ns)
-        {
-            var pvcs = client.Run(c => c.ListNamespacedPersistentVolumeClaim(ns));
-            foreach (var pvc in pvcs.Items)
-            {
-                try
-                {
-                    var pvName = pvc.Spec.VolumeName;
-                    var patch = new V1Patch("{\"metadata\":{\"finalizers\":[]}}", V1Patch.PatchType.MergePatch);
-                    client.Run(c => c.PatchNamespacedPersistentVolumeClaim(patch, pvc.Name(), ns));
-                    client.Run(c => c.DeleteNamespacedPersistentVolumeClaim(pvc.Name(), ns));
-                    log.Debug($"Deleted PVC '{pvc.Name()}' (PV: '{pvName}') in namespace '{ns}'.");
-                }
-                catch (k8s.Autorest.HttpOperationException ex)
-                {
-                    log.Error($"Failed to delete PVC '{pvc.Name()}' in namespace '{ns}': {ex.Response.ReasonPhrase}");
-                }
             }
         }
 
