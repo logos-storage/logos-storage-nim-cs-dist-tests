@@ -375,6 +375,7 @@ namespace KubernetesWorkflow
                             PriorityClassName = GetPriorityClassName(containerRecipes),
                             NodeSelector = CreateNodeSelector(location, containerRecipes),
                             Tolerations = CreateTolerations(containerRecipes),
+                            Affinity = CreateSpreadAffinity(),
                             Containers = CreateDeploymentContainers(containerRecipes),
                             Volumes = CreateVolumes(containerRecipes)
                         }
@@ -420,6 +421,34 @@ namespace KubernetesWorkflow
                 Value = t.Value,
                 Effect = t.Effect
             }).ToList();
+        }
+
+        private V1Affinity CreateSpreadAffinity()
+        {
+            return new V1Affinity
+            {
+                PodAntiAffinity = new V1PodAntiAffinity
+                {
+                    RequiredDuringSchedulingIgnoredDuringExecution = new List<V1PodAffinityTerm>
+                    {
+                        new V1PodAffinityTerm
+                        {
+                            TopologyKey = "kubernetes.io/hostname",
+                            LabelSelector = new V1LabelSelector
+                            {
+                                MatchExpressions = new List<V1LabelSelectorRequirement>
+                                {
+                                    new V1LabelSelectorRequirement
+                                    {
+                                        Key = PodLabelKey,
+                                        OperatorProperty = "Exists"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
         }
 
         private K8sNodeLabel? GetNodeLabelForLocation(ILocation location)
