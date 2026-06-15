@@ -20,10 +20,18 @@ namespace DistTestCore
 
         private static IKubernetes? CreateK8sClient()
         {
-            var kubeconfig = Environment.GetEnvironmentVariable("KUBECONFIG");
-            if (string.IsNullOrEmpty(kubeconfig)) return null;
-            var config = KubernetesClientConfiguration.BuildConfigFromConfigFile(kubeconfig);
-            return new Kubernetes(config);
+            try
+            {
+                var kubeconfig = Environment.GetEnvironmentVariable("KUBECONFIG");
+                var config = string.IsNullOrEmpty(kubeconfig)
+                    ? KubernetesClientConfiguration.BuildDefaultConfig()
+                    : KubernetesClientConfiguration.BuildConfigFromConfigFile(kubeconfig);
+                return new Kubernetes(config);
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         public Global()
