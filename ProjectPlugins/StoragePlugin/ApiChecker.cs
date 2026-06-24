@@ -10,7 +10,7 @@ namespace StoragePlugin
     public class ApiChecker
     {
         // <INSERT-OPENAPI-YAML-HASH>
-        private const string OpenApiYamlHash = "32-CA-3F-60-39-3D-DA-43-05-7F-F9-36-DB-4A-01-DB-9F-AC-11-36-22-9E-92-F9-42-F0-4F-9F-DC-E8-FD-01";
+        private const string OpenApiYamlHash = "79-88-91-C5-95-7A-C8-2B-2B-E6-14-1F-2D-02-E8-96-D3-D0-DC-65-97-C4-1D-9F-0F-B5-55-24-C1-43-2D-87";
         private const string OpenApiFilePath = "/logosstorage/openapi.yaml";
         private const string DisableEnvironmentVariable = "StoragePlugin_DISABLE_APICHECK";
 
