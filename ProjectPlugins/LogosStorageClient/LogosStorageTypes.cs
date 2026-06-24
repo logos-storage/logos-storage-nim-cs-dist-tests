@@ -7,8 +7,11 @@ namespace LogosStorageClient
     {
         public string[] Addrs { get; set; } = Array.Empty<string>();
         public string Spr { get; set; } = string.Empty;
+        public string ProviderRecord { get; set; } = string.Empty;
         public string Id { get; set; } = string.Empty;
         public string[] AnnounceAddresses { get; set; } = Array.Empty<string>();
+        public string Libp2pPubKey { get; set; } = string.Empty;
+        public string MixPubKey { get; set; } = string.Empty;
         public DebugInfoVersion Version { get; set; } = new();
         public DebugInfoTable Table { get; set; } = new();
     }

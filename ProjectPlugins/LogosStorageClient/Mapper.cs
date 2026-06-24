@@ -12,8 +12,11 @@ namespace LogosStorageClient
             {
                 Id = debugInfo.Id,
                 Spr = debugInfo.Spr,
+                ProviderRecord = debugInfo.ProviderRecord,
                 Addrs = debugInfo.Addrs.ToArray(),
                 AnnounceAddresses = debugInfo.AnnounceAddresses.ToArray(),
+                Libp2pPubKey = debugInfo.Libp2pPubKey,
+                MixPubKey = debugInfo.MixPubKey,
                 Version = Map(debugInfo.Storage),
                 Table = Map(debugInfo.Table)
             };
