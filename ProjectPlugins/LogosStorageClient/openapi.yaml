@@ -58,11 +58,11 @@ components:
     Node:
       type: object
       required:
-        - nodeId
-        - peerId
-        - record
-        - address
-        - seen
+       - nodeId
+       - peerId
+       - record
+       - address
+       - seen
       properties:
         nodeId:
           type: string
@@ -88,8 +88,8 @@ components:
     PeersTable:
       type: object
       required:
-        - localNode
-        - nodes
+       - localNode
+       - nodes
       properties:
         localNode:
           $ref: "#/components/schemas/Node"
