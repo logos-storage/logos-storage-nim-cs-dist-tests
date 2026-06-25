@@ -26,8 +26,4 @@
     <ProjectReference Include="..\MetricsPlugin\MetricsPlugin.csproj" />
   </ItemGroup>
 
-  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-    <Exec Command="dotnet run --project $(ProjectDir)\..\LogosStoragePluginPrebuild" />
-  </Target>
-
 </Project>

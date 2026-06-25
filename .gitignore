@@ -5,3 +5,7 @@ bin
 Tools/AutoClient/datapath
 .editorconfig
 .DS_Store
+
+# Materialized at build time from the Logos Storage docker image
+# (see ProjectPlugins/LogosStorageClient/LogosStorageClient.csproj).
+ProjectPlugins/LogosStorageClient/openapi.yaml

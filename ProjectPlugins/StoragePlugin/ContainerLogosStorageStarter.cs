@@ -11,14 +11,12 @@ namespace StoragePlugin
         private readonly IPluginTools pluginTools;
         private readonly ProcessControlMap processControlMap;
         private readonly LogosStorageContainerRecipe recipe;
-        private readonly ApiChecker apiChecker;
 
         public ContainerLogosStorageStarter(IPluginTools pluginTools, LogosStorageContainerRecipe recipe, ProcessControlMap processControlMap)
         {
             this.pluginTools = pluginTools;
             this.recipe = recipe;
             this.processControlMap = processControlMap;
-            apiChecker = new ApiChecker(pluginTools);
         }
 
         public ILogosStorageInstance[] BringOnline(LogosStorageSetup logosStorageSetup)
@@ -29,8 +27,6 @@ namespace StoragePlugin
             var startupConfig = CreateStartupConfig(logosStorageSetup);
 
             var containers = StartLogosStorageContainers(startupConfig, logosStorageSetup.NumberOfNodes, logosStorageSetup.Location);
-
-            apiChecker.CheckCompatibility(containers);
 
             foreach (var rc in containers)
             {

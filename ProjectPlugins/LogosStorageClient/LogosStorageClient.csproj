@@ -14,6 +14,54 @@
     <OpenApiReference Include="openapi.yaml" CodeGenerator="NSwagCSharp" Namespace="StorageOpenApi" ClassName="StorageApiClient" />
   </ItemGroup>
 
+  <!--
+    openapi.yaml is NOT committed. This target materializes it before NSwag reads it, so the
+    generated API client is always in sync with the container under test.
+
+    Wherever a Docker daemon is reachable (Docker Desktop on Mac/Windows, Docker Engine on
+    Linux, WSL) the spec is extracted (and always overwritten) byte-for-byte from the Logos
+    Storage image via 'docker cp' - no running process, so the image startup banner is never
+    emitted, and no shell redirection, so it is portable across platforms. The leading
+    'docker rm -f' clears any container left behind by an interrupted build.
+
+    Where no daemon is reachable (the CI runner pod has none) the spec must already be on disk,
+    pre-placed from that same image by the job's initContainer; otherwise the build fails loudly
+    rather than generate a client against an unknown spec.
+
+    Image selection mirrors ProjectPlugins/StoragePlugin/DockerImage.cs.
+  -->
+  <Target Name="MaterializeOpenApi" BeforeTargets="_GenerateOpenApiCode">
+    <PropertyGroup>
+      <StorageDockerImage Condition="'$(STORAGEDOCKERIMAGE)' != ''">$(STORAGEDOCKERIMAGE)</StorageDockerImage>
+      <StorageDockerImage Condition="'$(STORAGEDOCKERIMAGE)' == ''">logosstorage/logos-storage-nim:latest-dist-tests</StorageDockerImage>
+      <OpenApiPath>$(MSBuildThisFileDirectory)openapi.yaml</OpenApiPath>
+      <OpenApiExtractContainer>logos-storage-openapi-extract</OpenApiExtractContainer>
+    </PropertyGroup>
+
+    <!-- 'docker info' succeeds only when a daemon is reachable: true on developer machines
+         (Docker Desktop or Linux Docker Engine), false (or no docker CLI) in the CI runner pod. -->
+    <Exec Command="docker info" ContinueOnError="true" StandardOutputImportance="low" StandardErrorImportance="low">
+      <Output TaskParameter="ExitCode" PropertyName="DockerInfoExitCode" />
+    </Exec>
+
+    <!-- No daemon: require the spec to have been pre-placed by the initContainer. -->
+    <Error Condition="'$(DockerInfoExitCode)' != '0' AND !Exists('$(OpenApiPath)')" Text="No Docker daemon reachable and '$(OpenApiPath)' is missing. In CI it must be pre-placed from the Logos Storage image by the job's initContainer. Locally, start Docker (Desktop or Engine) so the spec can be extracted automatically." />
+    <Message Condition="'$(DockerInfoExitCode)' != '0'" Importance="high" Text="No Docker daemon reachable. Using existing '$(OpenApiPath)'." />
+
+    <!-- Daemon reachable: extract (always overwrite) byte-for-byte from the image. -->
+    <Message Condition="'$(DockerInfoExitCode)' == '0'" Importance="high" Text="Docker daemon detected. Materializing openapi.yaml from image '$(StorageDockerImage)'..." />
+    <Exec Condition="'$(DockerInfoExitCode)' == '0'" Command="docker rm -f $(OpenApiExtractContainer)" ContinueOnError="true" StandardOutputImportance="low" StandardErrorImportance="low" />
+    <Exec Condition="'$(DockerInfoExitCode)' == '0'" Command="docker create --name $(OpenApiExtractContainer) $(StorageDockerImage)" StandardOutputImportance="low" />
+    <Exec Condition="'$(DockerInfoExitCode)' == '0'" Command="docker cp $(OpenApiExtractContainer):/logosstorage/openapi.yaml &quot;$(OpenApiPath)&quot;" />
+    <Exec Condition="'$(DockerInfoExitCode)' == '0'" Command="docker rm -f $(OpenApiExtractContainer)" StandardOutputImportance="low" />
+
+    <!-- Force NSwag to regenerate the client from the just-materialized spec. Without this, an
+         incremental build keeps a client generated from a previously materialized spec (e.g.
+         after switching STORAGEDOCKERIMAGE or pulling an updated image), producing a client that
+         no longer matches the container under test. -->
+    <Delete Files="$(MSBuildProjectDirectory)/obj/openapiClient.cs" />
+  </Target>
+
 <ItemGroup>
 	<PackageReference Include="Microsoft.Extensions.ApiDescription.Client" Version="7.0.2">
 		<PrivateAssets>all</PrivateAssets>
