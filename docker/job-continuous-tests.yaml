@@ -20,6 +20,17 @@ spec:
       priorityClassName: system-node-critical
       nodeSelector:
         workload-type: "tests-runners-ci"
+      initContainers:
+      # Extract openapi.yaml from the storage image under test into a shared volume.
+      # The runner pod has no Docker daemon, so the StoragePlugin build consumes this
+      # file instead of extracting it itself (see ProjectPlugins/LogosStorageClient).
+      - name: fetch-openapi
+        image: ${STORAGEDOCKERIMAGE}
+        imagePullPolicy: Always
+        command: ["cp", "/logosstorage/openapi.yaml", "/shared/openapi.yaml"]
+        volumeMounts:
+        - name: openapi
+          mountPath: /shared
       containers:
       - name: ${NAMEPREFIX}-runner
         image: logosstorage/logos-storage-dist-tests:latest
@@ -60,6 +71,8 @@ spec:
           subPath: kubeconfig.yaml
         - name: logs
           mountPath: /var/log/storage-continuous-tests
+        - name: openapi
+          mountPath: /shared
       restartPolicy: Never
       volumes:
         - name: kubeconfig
@@ -68,3 +81,5 @@ spec:
         - name: logs
           hostPath:
             path: /var/log/storage-continuous-tests
+        - name: openapi
+          emptyDir: {}

@@ -32,6 +32,7 @@ env:
   NAMEPREFIX: d-tests-runner
   NAMESPACE: default
   COMMAND: dotnet test Tests/LogosStorageTests
+  STORAGEDOCKERIMAGE: logosstorage/logos-storage-nim:latest-dist-tests
   JOB_MANIFEST: docker/job-dist-tests.yaml
   KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
   KUBE_VERSION: v1.28.2

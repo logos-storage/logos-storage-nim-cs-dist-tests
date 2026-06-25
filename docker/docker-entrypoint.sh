@@ -16,6 +16,14 @@ git clone -b "${BRANCH}" "${SOURCE}" "${FOLDER}"
 echo -e "\nChanging folder to ${FOLDER}\n"
 cd "${FOLDER}"
 
+# Place the openapi.yaml that the job's initContainer extracted from the storage image
+# into the client project. This pod has no Docker daemon, so the StoragePlugin build
+# consumes this file instead of extracting it itself (see ProjectPlugins/LogosStorageClient).
+if [[ -f /shared/openapi.yaml ]]; then
+  echo -e "Using openapi.yaml extracted from the storage image by the initContainer\n"
+  cp /shared/openapi.yaml ProjectPlugins/LogosStorageClient/openapi.yaml
+fi
+
 # Run tests
 echo -e "Running tests from branch '$(git branch --show-current) ($(git rev-parse --short HEAD))'\n"
 
