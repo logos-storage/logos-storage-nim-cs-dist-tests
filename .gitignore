@@ -9,3 +9,7 @@ Tools/AutoClient/datapath
 # Materialized at build time from the Logos Storage docker image
 # (see ProjectPlugins/LogosStorageClient/LogosStorageClient.csproj).
 ProjectPlugins/LogosStorageClient/openapi.yaml
+
+# Local-only developer files
+CLAUDE.local.md
+dotnet-tools.json
