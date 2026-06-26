@@ -423,8 +423,16 @@ namespace KubernetesWorkflow
             }).ToList();
         }
 
-        private V1Affinity CreateSpreadAffinity()
+        private V1Affinity? CreateSpreadAffinity()
         {
+            // The required pod anti-affinity forces every pod in the namespace onto a
+            // distinct node. That only makes sense on the multi-node GKE release cluster
+            // (InternalToCluster). When running locally (ExternalToCluster, e.g. single-node
+            // Docker Desktop) it would leave all but the first pod stuck Pending forever, so
+            // we omit the affinity entirely in that case.
+            if (RunnerLocationUtils.GetRunnerLocation() == RunnerLocation.ExternalToCluster)
+                return null;
+
             return new V1Affinity
             {
                 PodAntiAffinity = new V1PodAntiAffinity
