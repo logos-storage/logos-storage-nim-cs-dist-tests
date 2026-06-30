@@ -53,10 +53,10 @@ namespace LogosStorageClient
         private readonly TransferSpeeds transferSpeeds;
         private string peerId = string.Empty;
         private string nodeId = string.Empty;
-        private readonly LogosStorageAccess logosStorageAccess;
+        private readonly ILogosStorageAccess logosStorageAccess;
         private readonly IFileManager fileManager;
 
-        public StorageNode(ILog log, LogosStorageAccess logosStorageAccess, IFileManager fileManager, IStorageNodeHooks hooks)
+        public StorageNode(ILog log, ILogosStorageAccess logosStorageAccess, IFileManager fileManager, IStorageNodeHooks hooks)
         {
             this.logosStorageAccess = logosStorageAccess;
             this.fileManager = fileManager;
@@ -226,13 +226,11 @@ namespace LogosStorageClient
 
         public void ConnectToPeer(IStorageNode node)
         {
-            var peer = (StorageNode)node;
-
-            Log($"Connecting to peer {peer.GetName()}...");
+            Log($"Connecting to peer {node.GetName()}...");
             var peerInfo = node.GetDebugInfo();
-            logosStorageAccess.ConnectToPeer(peerInfo.Id, GetPeerMultiAddresses(peer, peerInfo));
+            logosStorageAccess.ConnectToPeer(peerInfo.Id, GetPeerMultiAddresses(node, peerInfo));
 
-            Log($"Successfully connected to peer {peer.GetName()}.");
+            Log($"Successfully connected to peer {node.GetName()}.");
         }
 
         public void DeleteDataDirFolder()
@@ -307,7 +305,7 @@ namespace LogosStorageClient
             log.AddStringReplace(LogosStorageUtils.ToShortId(nodeId), nodeName);
         }
 
-        private string[] GetPeerMultiAddresses(StorageNode peer, DebugInfo peerInfo)
+        private string[] GetPeerMultiAddresses(IStorageNode peer, DebugInfo peerInfo)
         {
             var peerId = peer.GetDiscoveryEndpoint().Host
                 .Replace("http://", "")

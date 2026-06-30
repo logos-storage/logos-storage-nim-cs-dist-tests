@@ -7,7 +7,7 @@ using WebUtils;
 
 namespace LogosStorageClient
 {
-    public class LogosStorageAccess
+    public class LogosStorageAccess : ILogosStorageAccess
     {
         public const string API_BASE_URL = "/api/storage/v1";
 
