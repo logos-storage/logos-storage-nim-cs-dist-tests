@@ -10,7 +10,7 @@ namespace StoragePlugin
     public class ApiChecker
     {
         // <INSERT-OPENAPI-YAML-HASH>
-        private const string OpenApiYamlHash = "79-88-91-C5-95-7A-C8-2B-2B-E6-14-1F-2D-02-E8-96-D3-D0-DC-65-97-C4-1D-9F-0F-B5-55-24-C1-43-2D-87";
+        private const string OpenApiYamlHash = "F2-83-6E-23-8A-30-03-34-E8-24-52-B6-C3-00-21-5C-C0-3C-9C-5E-CB-CB-BF-68-47-7E-6A-87-D0-1F-46-8D";
         private const string OpenApiFilePath = "/logosstorage/openapi.yaml";
         private const string DisableEnvironmentVariable = "StoragePlugin_DISABLE_APICHECK";
 
@@ -55,9 +55,9 @@ namespace StoragePlugin
 
             var workflow = pluginTools.CreateWorkflow();
             var container = containers.First().Containers.First();
-            var containerApi = workflow.ExecuteCommand(container, "cat", OpenApiFilePath);
+            var openApiContents = workflow.ExecuteCommand(container, "cat", OpenApiFilePath);
 
-            if (string.IsNullOrEmpty(containerApi))
+            if (string.IsNullOrEmpty(openApiContents)) 
             {
                 log.Error(Warning);
 
@@ -65,7 +65,7 @@ namespace StoragePlugin
                 return;
             }
 
-            var containerHash = Hash(containerApi);
+            var containerHash = FileHash.HashContents(openApiContents);
             if (containerHash == OpenApiYamlHash)
             {
                 Log("API compatibility check passed.");
@@ -73,7 +73,7 @@ namespace StoragePlugin
                 return;
             }
 
-            OverwriteOpenApiYaml(containerApi);
+            OverwriteOpenApiYaml(openApiContents);
 
             log.Error(Failure);
             throw new Exception(Failure);
