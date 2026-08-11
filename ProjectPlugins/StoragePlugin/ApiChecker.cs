@@ -55,9 +55,9 @@ namespace StoragePlugin
 
             var workflow = pluginTools.CreateWorkflow();
             var container = containers.First().Containers.First();
-            var containerApi = workflow.ExecuteCommand(container, "cat", OpenApiFilePath);
+            var openApiContents = workflow.ExecuteCommand(container, "cat", OpenApiFilePath);
 
-            if (string.IsNullOrEmpty(containerApi))
+            if (string.IsNullOrEmpty(openApiContents)) 
             {
                 log.Error(Warning);
 
@@ -65,7 +65,7 @@ namespace StoragePlugin
                 return;
             }
 
-            var containerHash = Hash(containerApi);
+            var containerHash = FileHash.HashContents(openApiContents);
             if (containerHash == OpenApiYamlHash)
             {
                 Log("API compatibility check passed.");
@@ -73,7 +73,7 @@ namespace StoragePlugin
                 return;
             }
 
-            OverwriteOpenApiYaml(containerApi);
+            OverwriteOpenApiYaml(openApiContents);
 
             log.Error(Failure);
             throw new Exception(Failure);

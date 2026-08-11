@@ -1,6 +1,4 @@
-﻿using System.Security.Cryptography;
-using System.Text;
-using Utils;
+﻿using Utils;
 
 public static class Program
 {
@@ -22,7 +20,7 @@ public static class Program
         // Force client rebuild by deleting previous artifact.
         File.Delete(clientFile);
 
-        var hash = CreateHash(openApiFile);
+        var hash = FileHash.Hash(openApiFile);
         // This hash is used to verify that the Codex docker image being used is compatible
         // with the openapi.yaml being used by the Codex plugin.
         // If the openapi.yaml files don't match, an exception is thrown.
@@ -52,17 +50,6 @@ public static class Program
         var folder = Path.Combine(PluginPathUtils.ProjectPluginsDir, "LogosStorageClient");
         if (!Directory.Exists(folder)) throw new Exception("LogosStorageClient folder not found. Expected: " + folder);
         return folder;
-    }
-
-    private static string CreateHash(string openApiFile)
-    {
-        var file = File.ReadAllText(openApiFile);
-        var fileBytes = Encoding.ASCII.GetBytes(file
-            .Replace(Environment.NewLine, ""));
-
-        var sha = SHA256.Create();
-        var hash = sha.ComputeHash(fileBytes);
-        return BitConverter.ToString(hash);
     }
 
     private static void SearchAndInject(string hash, string targetFile)
