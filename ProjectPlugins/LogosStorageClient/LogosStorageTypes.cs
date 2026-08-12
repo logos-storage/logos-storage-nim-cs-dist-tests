@@ -9,7 +9,8 @@ namespace LogosStorageClient
         public string Spr { get; set; } = string.Empty;
         public string ProviderRecord { get; set; } = string.Empty;
         public string Id { get; set; } = string.Empty;
-        public string[] AnnounceAddresses { get; set; } = Array.Empty<string>();
+        public string[] DiscoveryAddresses { get; set; } = Array.Empty<string>();
+        public string[] ProviderAddresses { get; set; } = Array.Empty<string>();
         public string Libp2pPubKey { get; set; } = string.Empty;
         public string? MixPubKey { get; set; }
         public DebugInfoVersion Version { get; set; } = new();

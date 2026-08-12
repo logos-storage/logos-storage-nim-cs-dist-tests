@@ -45,15 +45,26 @@ namespace LogosStorageReleaseTests.NodeTests
         }
 
         [Test]
-        public void AnnounceAddress()
+        public void DiscoveryAddress()
         {
             var node = StartLogosStorage(s => s.WithLogFormat(LogosStorageLogFormat.Json));
             var addr = node.GetListenEndpoint();
 
             var info = node.GetDebugInfo();
 
-            Assert.That(info.AnnounceAddresses.Count, Is.GreaterThan(0));
-            // Ideally we'd assert the pod IP is in the announce address, but we can't access it from here.
+            Assert.That(info.DiscoveryAddresses.Count, Is.GreaterThan(0));
+            // Ideally we'd assert the pod IP is in the discovery address, but we can't access it from here.
+        }
+        [Test]
+        public void ProviderAddress()
+        {
+            var node = StartLogosStorage(s => s.WithLogFormat(LogosStorageLogFormat.Json));
+            var addr = node.GetListenEndpoint();
+
+            var info = node.GetDebugInfo();
+
+            Assert.That(info.ProviderAddresses.Count, Is.GreaterThan(0));
+            // Ideally we'd assert the pod IP is in the provider address, but we can't access it from here.
         }
     }
 }
