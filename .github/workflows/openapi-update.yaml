@@ -1,0 +1,107 @@
+name: OpenAPI Update
+
+on:
+  repository_dispatch:
+    types: [openapi-update]
+  workflow_dispatch:
+    inputs:
+      openapi_url:
+        description: "OpenAPI URL that should be used"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Inputs handling
+        run: |
+          if [ "${{ github.event_name }}" == "repository_dispatch" ]; then
+            if [ -z "${{ github.event.client_payload.openapi_url }}" ]; then
+              echo "Error: 'openapi_url' is missing in client_payload."
+              exit 1
+            fi
+
+            echo "OPENAPI_URL=${{ github.event.client_payload.openapi_url }}" >> $GITHUB_ENV
+          else
+            echo "OPENAPI_URL=${{ github.event.inputs.openapi_url }}" >> $GITHUB_ENV
+          fi
+
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Download OpenAPI spec
+        run: wget "$OPENAPI_URL" -O ProjectPlugins/LogosStorageClient/openapi.yaml
+
+      - name: Inject hash into ApiChecker
+        run: dotnet run --project ProjectPlugins/LogosStoragePluginPrebuild/LogosStoragePluginPrebuild.csproj
+
+      - name: Rebuild client
+        id: rebuild
+        shell: bash
+        run: |
+          if dotnet build ProjectPlugins/LogosStorageClient/LogosStorageClient.csproj > /tmp/build.log 2>&1; then
+            echo "BUILD_FAILED=false" >> $GITHUB_ENV
+            echo "PR_TITLE=chore: update openapi.yaml and regenerate client" >> $GITHUB_ENV
+            echo "COMMIT_MESSAGE=chore: update openapi.yaml and regenerate client" >> $GITHUB_ENV
+          else
+            echo "BUILD_FAILED=true" >> $GITHUB_ENV
+            echo "PR_TITLE=chore: update openapi.yaml (client requires manual updates)" >> $GITHUB_ENV
+            echo "COMMIT_MESSAGE=chore: update openapi.yaml (client requires manual updates)" >> $GITHUB_ENV
+            tail -n 60 /tmp/build.log > /tmp/build-error.log
+            tail -n 60 /tmp/build.log
+          fi
+
+      - name: Prepare PR body
+        shell: bash
+        run: |
+          cat > /tmp/pr-body.md <<EOF
+          OpenAPI spec update from $OPENAPI_URL
+          EOF
+          if [ "$BUILD_FAILED" == "true" ]; then
+            cat >> /tmp/pr-body.md <<'EOF'
+
+          ## Build failure
+
+          The openapi.yaml spec was updated from logos-storage-nim, but the OpenAPI client (openapiClient.cs) failed to rebuild after the openapi.yaml updates. This is likely due to manual changes needed because of the updates.
+
+          ### Error message
+
+          ```text
+          EOF
+            cat /tmp/build-error.log >> /tmp/pr-body.md
+            cat >> /tmp/pr-body.md <<'EOF'
+          ```
+
+          ### How to rebuild the OpenAPI client
+
+          1. Run `dotnet build ProjectPlugins/LogosStorageClient/LogosStorageClient.csproj` to regenerate `obj/openapiClient.cs` from the updated `ProjectPlugins/LogosStorageClient/openapi.yaml`.
+          2. Inspect the NSwag error output above and update the hand-written wrapper code in `ProjectPlugins/LogosStorageClient/` (e.g. `Mapper.cs`, `LogosStorageAccess.cs`, `LogosStorageTypes.cs`) to match the new spec.
+          3. Rebuild until `dotnet build ProjectPlugins/LogosStorageClient/LogosStorageClient.csproj` succeeds.
+          4. Commit the required manual changes to `ProjectPlugins/LogosStorageClient/`.
+          EOF
+          else
+            cat >> /tmp/pr-body.md <<'EOF'
+
+          The OpenAPI client was regenerated successfully.
+          EOF
+          fi
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v7
+        if: always()
+        with:
+          branch: chore/openapi-update
+          delete-branch: true
+          title: ${{ env.PR_TITLE }}
+          body-path: /tmp/pr-body.md
+          commit-message: ${{ env.COMMIT_MESSAGE }}
