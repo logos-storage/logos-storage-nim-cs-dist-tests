@@ -18,7 +18,10 @@ public static class Program
         var targetFile = Path.Combine(pluginRoot, "ApiChecker.cs");
 
         // Force client rebuild by deleting previous artifact.
-        File.Delete(clientFile);
+        if (File.Exists(clientFile))
+        {
+            File.Delete(clientFile);
+        }
 
         var hash = FileHash.Hash(openApiFile);
         // This hash is used to verify that the Codex docker image being used is compatible

@@ -63,7 +63,6 @@ jobs:
 
       - name: Prepare PR body
         shell: bash
-        if: always()
         run: |
           cat > /tmp/pr-body.md <<EOF
           OpenAPI spec update from $OPENAPI_URL
