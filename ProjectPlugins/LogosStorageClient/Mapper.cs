@@ -12,10 +12,7 @@ namespace LogosStorageClient
             {
                 Id = debugInfo.Id,
                 Spr = debugInfo.Spr,
-                ProviderRecord = debugInfo.ProviderRecord,
                 Addrs = debugInfo.Addrs.ToArray(),
-                DiscoveryAddresses = debugInfo.DiscoveryAddresses.ToArray(),
-                ProviderAddresses = debugInfo.ProviderAddresses.ToArray(),
                 Libp2pPubKey = debugInfo.Libp2pPubKey,
                 MixPubKey = debugInfo.MixPubKey,
                 Version = Map(debugInfo.Storage),
@@ -73,11 +70,10 @@ namespace LogosStorageClient
             if (token == null) return new DebugInfoTableNode();
             return new DebugInfoTableNode
             {
-                Address = token.Address,
-                NodeId = token.NodeId,
+                NodeId = token.PeerId,
                 PeerId = token.PeerId,
-                Record = token.Record,
-                Seen = token.Seen
+                Address = string.Empty,
+                Seen = token.LastSeen.HasValue
             };
         }
 

@@ -117,25 +117,25 @@ namespace LogosStorageClient
 
         public string UploadFile(UploadInput uploadInput)
         {
-            return OnLogosStorage(api => api.UploadAsync(uploadInput.ContentType, uploadInput.ContentDisposition, uploadInput.FileStream));
+            return OnLogosStorage(api => api.UploadAsync(uploadInput.ContentType, uploadInput.ContentDisposition, true, uploadInput.FileStream));
         }
 
         public Stream DownloadFile(string contentId)
         {
-            var fileResponse = OnLogosStorageNoRetry(api => api.DownloadNetworkStreamAsync(contentId));
+            var fileResponse = OnLogosStorageNoRetry(api => api.DownloadNetworkStreamAsync(contentId, true));
             if (fileResponse.StatusCode != 200) throw new Exception("Download failed with StatusCode: " + fileResponse.StatusCode);
             return fileResponse.Stream;
         }
 
         public LocalDataset DownloadStreamless(ContentId cid)
         {
-            var response = OnLogosStorage(api => api.DownloadNetworkAsync(cid.Id));
+            var response = OnLogosStorage(api => api.DownloadNetworkAsync(cid.Id, true));
             return mapper.Map(response);
         }
 
         public LocalDataset DownloadManifestOnly(ContentId cid)
         {
-            var response = OnLogosStorage(api => api.DownloadNetworkManifestAsync(cid.Id));
+            var response = OnLogosStorage(api => api.DownloadNetworkManifestAsync(cid.Id, true));
             return mapper.Map(response);
         }
 
