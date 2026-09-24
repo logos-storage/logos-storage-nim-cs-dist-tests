@@ -5,16 +5,18 @@ namespace LogosStorageClient
 {
     public class DebugInfo
     {
+        public string Id { get; set; } = string.Empty;
         public string[] Addrs { get; set; } = Array.Empty<string>();
         public string Spr { get; set; } = string.Empty;
-        public string ProviderRecord { get; set; } = string.Empty;
-        public string Id { get; set; } = string.Empty;
-        public string[] DiscoveryAddresses { get; set; } = Array.Empty<string>();
-        public string[] ProviderAddresses { get; set; } = Array.Empty<string>();
         public string Libp2pPubKey { get; set; } = string.Empty;
+        public string ProviderRecord { get; set; } = string.Empty;
         public string? MixPubKey { get; set; }
         public DebugInfoVersion Version { get; set; } = new();
         public DebugInfoTable Table { get; set; } = new();
+        // This is missing:
+        // - NatDebugInfo
+        // - Connections
+        // but I will not add them as they're not used here.
     }
 
     public class DebugInfoVersion
