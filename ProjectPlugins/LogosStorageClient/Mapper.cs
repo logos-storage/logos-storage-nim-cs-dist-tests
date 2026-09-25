@@ -71,7 +71,7 @@ namespace LogosStorageClient
 
             // We assume that any address is as good as the other.
             string [] parts = token.Addresses.ElementAt(0).Split("/");
-            string address = parts.Length >= 4 ? $"{parts[1]}:{parts[3]}" : "unknown";
+            string address = parts.Length >= 4 ? $"{parts[2]}:{parts[4]}" : "unknown";
             return new DebugInfoTableNode
             {
                 NodeId = token.PeerId,
