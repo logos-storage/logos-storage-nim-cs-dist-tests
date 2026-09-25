@@ -68,12 +68,15 @@ namespace LogosStorageClient
         private DebugInfoTableNode Map(StorageOpenApi.Node? token)
         {
             if (token == null) return new DebugInfoTableNode();
+
+            // We assume that any address is as good as the other.
+            string [] parts = token.Addresses.ElementAt(0).Split("/");
+            string address = parts.Length >= 4 ? $"{parts[1]}:{parts[3]}" : "unknown";
             return new DebugInfoTableNode
             {
                 NodeId = token.PeerId,
                 PeerId = token.PeerId,
-                Address = string.Empty,
-                Seen = token.LastSeen.HasValue
+                Address = address,
             };
         }
 
