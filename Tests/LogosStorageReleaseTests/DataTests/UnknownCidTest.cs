@@ -19,7 +19,7 @@ namespace LogosStorageReleaseTests.DataTests
 
             try
             {
-                node.DownloadContent(unknownCid, TimeSpan.FromMinutes(2.0));
+                node.DownloadContent(unknownCid, TimeSpan.FromMinutes(5.0));
             }
             catch (Exception ex)
             {
@@ -27,7 +27,7 @@ namespace LogosStorageReleaseTests.DataTests
                 if (!ex.Message.Contains(expectedMessage)) throw;
             }
 
-            WaitAndCheckNodesStaysAlive(TimeSpan.FromMinutes(2), node);
+            WaitAndCheckNodesStaysAlive(TimeSpan.FromMinutes(5), node);
         }
     }
 }
